@@ -1,0 +1,31 @@
+﻿# Virtual Environments
+venv/
+.venv/
+env/
+bin/
+lib/
+
+# Configuration & Secrets
+.env                # 환경 변수 (API 키, DB 비번 등)
+config.yaml         # 로컬 설정 파일
+.vscode/            # 개인 VS Code 설정 (팀원마다 다를 수 있음)
+.idea/              # PyCharm 설정 폴더
+
+*.csv               # 개별 CSV 파일들
+*.xlsx              # 엑셀 데이터
+
+# Machine Learning Models
+*.pth        # PyTorch 모델
+*.h5         # TensorFlow/Keras 모델
+*.pkl        # Scikit-learn 피클 파일
+*.onnx       # ONNX 모델
+.ipynb_checkpoints/ # 주피터 노트북 체크포인트
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+logs/
+*.log
