@@ -1,0 +1,67 @@
+﻿# ============================================================
+# 난임 환자 임신 성공 여부 예측 - requirements.txt
+# ============================================================
+
+# === 기본 데이터 처리 ===
+numpy==1.24.3
+pandas==2.0.3
+scipy==1.11.4
+
+# === 시각화 ===
+matplotlib==3.7.5
+seaborn==0.13.2
+plotly==5.18.0
+
+# === 머신러닝 (Scikit-learn) ===
+scikit-learn==1.3.2
+
+# === 부스팅 모델 ===
+lightgbm==4.1.0
+xgboost==2.0.3
+catboost==1.2.2
+
+# === 하이퍼파라미터 튜닝 ===
+optuna==3.5.0
+
+# === 불균형 데이터 처리 ===
+imbalanced-learn==0.11.0
+
+# === 피처 엔지니어링 ===
+feature-engine==1.6.2
+category_encoders==2.6.3
+
+# === 딥러닝 (PyTorch 기반) ===
+torch==2.1.2
+torchvision==0.16.2
+
+# === 딥러닝 (TensorFlow/Keras 기반) ===
+tensorflow==2.15.0
+keras==2.15.0
+
+# === 테이블 데이터 전용 딥러닝 ===
+pytorch-tabnet==4.1.0
+pytorch-tabular==1.1.0
+
+# === AutoML ===
+# autogluon==1.0.0
+
+# === 모델 해석 ===
+shap==0.44.1
+lime==0.2.0.1
+eli5==0.13.0
+
+# === 실험 관리 ===
+mlflow==2.10.0
+wandb==0.16.2
+
+# === 유틸리티 ===
+tqdm==4.66.1
+joblib==1.3.2
+pyyaml==6.0.1
+python-dotenv==1.0.0
+
+# === Jupyter 환경 ===
+jupyter==1.0.0
+ipykernel==6.27.1
+ipywidgets==8.1.1
+notebook==7.0.6
