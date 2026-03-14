@@ -197,13 +197,17 @@ Baseline 대비 소폭 성능 개선
 
 ### PR Curve
 
-![](outputs/xgb_v1_pr_curve.png)
+<p align="center">
+<img src="outputs/xgb_v1_pr_curve.png" width="500">
+</p>
 
 ### Feature Importance
 
-![](outputs/xgb_v1_feature_importance.png)
+<p align="center">
+<img src="outputs/xgb_v1_feature_importance.png" width="700">
+</p>
 
-Feature Importance
+
 
 # 🚀 Future Work
 
@@ -227,19 +231,20 @@ ROC-AUC 0.74 → 0.76+
 Feature Engineering + Model Tuning을 통한 성능 개선
 
 # 📂 Repository Structure
+```
 yysop/
 ├── data/
 ├── outputs/
-│   ├── xgb_v1_roc_curve.png
-│   ├── xgb_v1_pr_curve.png
-│   ├── xgb_v1_feature_importance.png
-│   └── xgb_v2_reg_relax_roc_curve.png
+│ ├── xgb_v1_roc_curve.png
+│ ├── xgb_v1_pr_curve.png
+│ ├── xgb_v1_feature_importance.png
+│ └── xgb_v2_reg_relax_roc_curve.png
 ├── src/
-│   ├── eda.py
-│   ├── xgb_kfold_v1.py
-│   └── xgb_kfold_v2.py
+│ ├── eda.py
+│ ├── xgb_kfold_v1.py
+│ └── xgb_kfold_v2.py
 └── README.md
-
+```
 
 # 🧑‍⚕️ Expected Impact
 
