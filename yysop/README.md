@@ -193,15 +193,15 @@ Baseline 대비 소폭 성능 개선
 
 | Baseline (v1) | Tuned (v2) |
 |------|------|
-| ![](yysop/outputs/xgb_v1_roc_curve.png) | ![](yysop/outputs/xgb_v2_reg_relax_roc_curve.png) |
+| ![](outputs/xgb_v1_roc_curve.png) | ![](outputs/xgb_v2_reg_relax_roc_curve.png) 
 
 ### PR Curve
 
-![](yysop/outputs/xgb_v1_pr_curve.png)
+![](outputs/xgb_v1_pr_curve.png)
 
 ### Feature Importance
 
-![](yysop/outputs/xgb_v1_feature_importance.png)
+![](outputs/xgb_v1_feature_importance.png)
 
 Feature Importance
 
