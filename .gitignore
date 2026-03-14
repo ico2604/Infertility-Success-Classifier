@@ -42,3 +42,4 @@ logs/
 *.log
 
 yysop/outputs/eda/*.csv
+yysop/outputs/*.csv
