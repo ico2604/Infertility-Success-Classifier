@@ -1,26 +1,39 @@
 <div align="center">
- 
+
 # 🧬 난임 치료를 위한 AI 모델
 ## 임신 성공 예측 — Machine Learning 기반
- 
+
 <br>
- 
+
 [![Python](https://img.shields.io/badge/Python-3.10-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![XGBoost](https://img.shields.io/badge/XGBoost-3.2.0-FF6600?style=for-the-badge)](https://xgboost.readthedocs.io)
-[![CatBoost](https://img.shields.io/badge/CatBoost-최신버전-FFCC00?style=for-the-badge)](https://catboost.ai)
-[![LightGBM](https://img.shields.io/badge/LightGBM-최신버전-2ECC71?style=for-the-badge)](https://lightgbm.readthedocs.io)
- 
+[![CatBoost](https://img.shields.io/badge/CatBoost-1.2.10-FFCC00?style=for-the-badge)](https://catboost.ai)
+[![LightGBM](https://img.shields.io/badge/LightGBM-4.6.0-2ECC71?style=for-the-badge)](https://lightgbm.readthedocs.io)
+[![Optuna](https://img.shields.io/badge/Optuna-4.7.0-6C63FF?style=for-the-badge)](https://optuna.org)
+[![scikit--learn](https://img.shields.io/badge/scikit--learn-1.8.0-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org)
+[![pandas](https://img.shields.io/badge/pandas-3.0.1-150458?style=for-the-badge&logo=pandas&logoColor=white)](https://pandas.pydata.org)
+[![numpy](https://img.shields.io/badge/numpy-2.4.3-013243?style=for-the-badge&logo=numpy&logoColor=white)](https://numpy.org)
+
 <br>
- 
+
 ### 🏆 리더보드 점수
- 
-# `ROC-AUC : 0.74218`
- 
+
+### `ROC-AUC : 0.74218`
+
 <br>
- 
+
 </div>
- 
+
 ---
+
+### 실행 환경
+
+| 항목 | 내용 |
+|------|------|
+| OS | Windows 11 |
+| 가상환경 | `.venv` (프로젝트 로컬) |
+ 
+
  
 ## 📌 프로젝트 개요
  
@@ -799,9 +812,6 @@ search_space = {
 yysop/
 │
 ├── 📁 data/
-│   ├── train.csv
-│   ├── test.csv
-│   └── sample_submission.csv
 │
 ├── 📁 outputs/
 │   ├── xgb_v1_roc_curve.png
@@ -814,9 +824,6 @@ yysop/
 │   ├── 🔵 XGBoost
 │   │   ├── xgb_kfold_v1.py            # 기본 모델
 │   │   ├── xgb_kfold_v2.py            # reg_relax
-│   │   ├── xgb_kfold_v3.py            # Feature 확장 (실험용)
-│   │   ├── xgb_kfold_v4.py            # Feature 축소 (실험용)
-│   │   ├── xgb_kfold_v5_branch.py     # Branch Feature (실험용)
 │   │   └── xgb_optuna_v1.py           # Optuna 튜닝 ⭐
 │   │
 │   ├── 🟠 CatBoost
@@ -826,10 +833,7 @@ yysop/
 │   │   └── lightgbm_kfold_v1.py       # 기본 모델 v1
 │   │
 │   └── 📊 Ensemble
-│       ├── ensemble_v1.py                 # XGB+CAT 2-Model
 │       ├── ensemble_v2.py                 # 3-Model Probability Ensemble ⭐ OOF 최고
-│       ├── ensemble_baseline_search.py    # Weight Grid Search
-│       ├── ensemble_v3_stacking.py        # Stacking (Logistic Meta Model)
 │       └── ensemble_v4_rank_ensemble.py   # Rank Ensemble ✅ 리더보드 제출 / ⭐ 재실험 최고
 │
 └── 📄 README.md
