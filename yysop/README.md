@@ -18,7 +18,7 @@
 
 ### 🏆 리더보드 점수
 
-### `ROC-AUC : 0.74218`
+### `ROC-AUC : 0.74217`
 
 <br>
 
@@ -64,7 +64,7 @@
 | XGBoost v2 reg_relax — Day2 단일 기준 | xgb v2 | 0.74011 | — |
 | XGBoost Optuna v1 — 단일 최고 | xgb optuna | 0.74016 | — |
 | Probability Weighted Ensemble — OOF 최고 | xgb optuna | 0.740482 | — |
-| 🥇 **Rank Ensemble — 최종 제출 모델** | xgb v2 | 0.740448 | **0.74218** |
+| 🥇 **Rank Ensemble — 최종 제출 모델** | xgb v2 | 0.740448 | **0.74217** |
 | ⭐ **Rank Ensemble — 최신 재실험 최고** | xgb optuna | **0.740487** | — |
  
 </div>
@@ -73,8 +73,8 @@
  
 > 💡 **최종 제출 모델 기준**  
 > OOF ROC-AUC: **0.740448**  
-> Public LB: **0.74218**  
-> → OOF 대비 **+0.00173 상승**, 과적합 없이 안정적으로 일반화됨을 확인
+> Public LB: **0.74217**  
+> → OOF 대비 **+0.001722 상승**, 과적합 없이 안정적으로 일반화됨을 확인
  
 > 💡 **최신 내부 검증 최고 모델 기준**  
 > Probability Weighted Baseline: **0.740444**  
@@ -107,7 +107,7 @@
 │      (XGB Optuna 반영)                                     │
 │  v3  Stacking (LogisticRegression)     → 0.740128 ❌       │
 │  v4  Rank Ensemble (XGB v2)            → 0.740448         │
-│      └─ Public LB                      → 0.74218 ✅        │
+│      └─ Public LB                      → 0.74217 ✅        │
 │  v4* Rank Ensemble (XGB Optuna)        → 0.740487 ⭐       │
 └────────────────────────────────────────────────────────────┘
 ```
@@ -331,7 +331,7 @@ early_stopping_rounds = 50
 | 9 | `xgb_kfold_v5_branch.py` | IVF/DI Branch Feature 추가 | 0.740036 |
 | 10 | `ensemble_baseline_search.py` | Weight Grid Search (XGB v2 기준) | 0.740444 |
 | 11 | `ensemble_v3_stacking.py` (1차) | Stacking (기존 XGB 버전) | 0.740050 |
-| 12 | `ensemble_v4_rank_ensemble.py` (1차) | Rank Ensemble (XGB v2) | **0.740448 / LB 0.74218** |
+| 12 | `ensemble_v4_rank_ensemble.py` (1차) | Rank Ensemble (XGB v2) | **0.740448 / LB 0.74217** |
 | 13 | `ensemble_v3_stacking.py` (2차) | Stacking 재실험 (XGB Optuna) | 0.740128 |
 | 14 | `ensemble_v4_rank_ensemble.py` (2차) | Rank Ensemble 재실험 (XGB Optuna) | **0.740487** ⭐ |
  
@@ -550,7 +550,7 @@ final_pred = w_xgb × xgb_rank + w_cat × cat_rank + w_lgb × lgb_rank
 | Ensemble | 가중치 (XGB/CAT/LGB) | OOF ROC-AUC | 리더보드 |
 |----------|-----------------------|:-----------:|:---------:|
 | Rank Equal | 0.33 / 0.33 / 0.33 | 0.740426 | — |
-| **Rank Weighted** | **0.33 / 0.41 / 0.26** | **0.740448** | **0.74218 ✅** |
+| **Rank Weighted** | **0.33 / 0.41 / 0.26** | **0.740448** | **0.74217 ✅** |
  
 > 📌 당시에는 xgb_optuna_v1 결과가 실험 흐름에서 완전히 반영되지 않아  
 > XGB v2 기준으로 Rank Ensemble을 구성하고 제출하였다.
@@ -620,7 +620,7 @@ Baseline: 0.740444
 | Stacking vs Weighted Ensemble | 0.740128 vs 0.740482 | 단순 결합이 더 효과적 |
 | OOF 최고 (Probability) | 0.740482 | XGB Optuna 기준 |
 | OOF 최고 (Rank) | **0.740487** | 현재 전체 최고 |
-| OOF vs 리더보드 (제출) | 0.740448 vs **0.74218** | **+0.00173 일반화 이득** |
+| OOF vs 리더보드 (제출) | 0.740448 vs **0.74217** | **+0.00173 일반화 이득** |
  
 <br>
  
@@ -636,7 +636,7 @@ Baseline: 0.740444
 | 4️⃣ | **Rank > Stacking** | Stacking 0.740128 vs Rank 0.740487 | 단순 결합이 더 안정적 |
 | 5️⃣ | **CatBoost = Diversity Provider** | 단일 성능 < XGB, 가중치는 최대 | CatBoost 튜닝 우선 근거 |
 | 6️⃣ | **실험 로그 관리 중요** | Optuna 기록 누락으로 XGB 버전 혼재 | 버전 통일 필요 |
-| 7️⃣ | **OOF < 리더보드** | +0.00173 상승 | 안정적 일반화 확인 |
+| 7️⃣ | **OOF < 리더보드** | +0.001722 상승 | 안정적 일반화 확인 |
  
 <br>
  
@@ -685,7 +685,7 @@ Day 3  ────  🟠 CatBoost v2 학습 (0.74005)
              📦 Ensemble v4 Rank Ensemble (XGB v2)
                       │  0.740448
                       ▼
-             📤 리더보드 제출 → 0.74218 ✅
+             📤 리더보드 제출 → 0.74217 ✅
                       │
                       ▼
              📦 Ensemble v3 Stacking 재실험 (XGB Optuna)
