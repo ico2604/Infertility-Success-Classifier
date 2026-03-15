@@ -24,9 +24,6 @@
 # - baseline이 다소 보수적으로 보여 표현력을 조금 풀어주는 방향이 유리할 수 있음
 # - 현재 데이터 불균형은 있지만 아주 극단적이지 않아 scale_pos_weight를 끈 버전도
 #   반드시 비교해볼 가치가 큼
-#
-# 실행 방법
-#   python yysop/src/xgb_kfold_v2.py
 # =========================================================
 
 import os
@@ -61,8 +58,11 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 TRAIN_PATH = os.path.join(DATA_DIR, "train.csv")
 TEST_PATH = os.path.join(DATA_DIR, "test.csv")
 
-TARGET_COL = "임신 성공 여부"
+TARGET_COL = "임신 성공 여부"   # 학습/OOF 평가용
 ID_COL = "ID"
+
+SUBMIT_ID_COL = "ID"
+SUBMIT_TARGET_COL = "probability"
 
 SEED = 42
 N_FOLDS = 5
@@ -812,8 +812,8 @@ print(f"[저장] {threshold_path}")
 print_section("17. 제출 파일 생성")
 
 submission = pd.DataFrame({
-    ID_COL: test[ID_COL].values,
-    TARGET_COL: test_preds
+    SUBMIT_ID_COL: test[ID_COL].values,
+    SUBMIT_TARGET_COL: test_preds,
 })
 
 sub_path = os.path.join(OUTPUT_DIR, f"xgb_v2_{EXPERIMENT_NAME}_submission.csv")

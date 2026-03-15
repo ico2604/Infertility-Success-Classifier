@@ -19,10 +19,6 @@
 # 6) scale_pos_weight 자동 결정     → 클래스 비율 확인 후 조건부 적용
 # 7) importance reset_index         → CSV 저장 시 보기 좋은 인덱스 정리
 # 8) OOF 저장                       → 스태킹/앙상블 재활용 가능
-#
-# 실행 방법
-#   python yysop/src/xgb_kfold_v1.py
-#
 # 참고
 # - xgboost 3.2.0 기준:
 #   early_stopping_rounds는 XGBClassifier 생성자에 넣는 방식으로 작성
@@ -62,8 +58,11 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 TRAIN_PATH = os.path.join(DATA_DIR, "train.csv")
 TEST_PATH = os.path.join(DATA_DIR, "test.csv")
 
-TARGET_COL = "임신 성공 여부"
+TARGET_COL = "임신 성공 여부"   # 학습/OOF 평가용
 ID_COL = "ID"
+
+SUBMIT_ID_COL = "ID"
+SUBMIT_TARGET_COL = "probability"
 
 SEED = 42
 N_FOLDS = 5
@@ -764,17 +763,17 @@ print(f"[저장] {oof_path}")
 # =========================================================
 print_section("14. 제출 파일 생성")
 
-# test_preds는 5개 폴드 예측의 평균 (폴드 앙상블)
-# round() 없이 float 그대로 저장 → ranking 손실 방지
 submission = pd.DataFrame({
-    ID_COL: test[ID_COL].values,
-    TARGET_COL: test_preds,
+    SUBMIT_ID_COL: test[ID_COL].values,
+    SUBMIT_TARGET_COL: test_preds,
 })
 
 sub_path = os.path.join(OUTPUT_DIR, "xgb_v1_submission.csv")
 submission.to_csv(sub_path, index=False, encoding="utf-8-sig")
 print(f"[저장] {sub_path}")
 print(submission.head(10))
+print("\n[제출 파일 컬럼 확인]")
+print(submission.columns.tolist())
 
 
 # =========================================================
