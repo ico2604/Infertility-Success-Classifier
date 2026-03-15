@@ -9,9 +9,6 @@
 # 5) Stratified K-Fold + OOF 방식으로 안정적인 내부 검증을 수행한다.
 # 6) 실험 결과를 누적 로그로 저장한다.
 # 7) Feature Importance / OOF / Submission 파일을 저장한다.
-#
-# 실행 방법
-#   python yysop/src/lightgbm_kfold_v1.py
 # =========================================================
 
 import os

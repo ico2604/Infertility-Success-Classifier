@@ -9,9 +9,6 @@
 # 5) AUC 비율 기반 reference weight도 함께 계산한다.
 # 6) equal / ref / best-grid submission을 모두 저장한다.
 # 7) 앙상블 실험 결과를 로그 파일로 누적 저장한다.
-#
-# 실행 방법
-#   python yysop/src/ensemble_v2.py
 # =========================================================
 
 import os
@@ -32,9 +29,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTPUT_DIR = os.path.join(BASE_DIR, "outputs")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-TARGET_COL = "임신 성공 여부"
+TARGET_COL = "임신 성공 여부"   # OOF 평가용
 ID_COL = "ID"
 OOF_PRED_COL = "oof_pred_prob"
+
+# 대회 제출 형식
+SUBMIT_ID_COL = "ID"
+SUBMIT_TARGET_COL = "probability"
 
 # ---------------------------------------------------------
 # 입력 파일 경로
@@ -350,25 +351,24 @@ for name, pred in oof_save_specs:
 # =========================================================
 print_section("12. submission 로드 및 정렬")
 
-xgb_sub = load_and_sort_csv(XGB_SUB_PATH, ID_COL)
-cat_sub = load_and_sort_csv(CAT_SUB_PATH, ID_COL)
-lgb_sub = load_and_sort_csv(LGB_SUB_PATH, ID_COL)
+xgb_sub = load_and_sort_csv(XGB_SUB_PATH, SUBMIT_ID_COL)
+cat_sub = load_and_sort_csv(CAT_SUB_PATH, SUBMIT_ID_COL)
+lgb_sub = load_and_sort_csv(LGB_SUB_PATH, SUBMIT_ID_COL)
 
-required_sub_cols = [ID_COL, TARGET_COL]
+required_sub_cols = [SUBMIT_ID_COL, SUBMIT_TARGET_COL]
 for col in required_sub_cols:
     assert col in xgb_sub.columns, f"XGB submission 파일에 '{col}' 컬럼이 없습니다."
     assert col in cat_sub.columns, f"CAT submission 파일에 '{col}' 컬럼이 없습니다."
     assert col in lgb_sub.columns, f"LGB submission 파일에 '{col}' 컬럼이 없습니다."
 
-assert (xgb_sub[ID_COL].values == cat_sub[ID_COL].values).all(), "XGB와 CAT submission의 ID가 다릅니다."
-assert (xgb_sub[ID_COL].values == lgb_sub[ID_COL].values).all(), "XGB와 LGB submission의 ID가 다릅니다."
+assert (xgb_sub[SUBMIT_ID_COL].values == cat_sub[SUBMIT_ID_COL].values).all(), "XGB와 CAT submission의 ID가 다릅니다."
+assert (xgb_sub[SUBMIT_ID_COL].values == lgb_sub[SUBMIT_ID_COL].values).all(), "XGB와 LGB submission의 ID가 다릅니다."
 
 print("submission ID 정렬 및 일치 확인 완료")
 
-xgb_test = xgb_sub[TARGET_COL].values
-cat_test = cat_sub[TARGET_COL].values
-lgb_test = lgb_sub[TARGET_COL].values
-
+xgb_test = xgb_sub[SUBMIT_TARGET_COL].values
+cat_test = cat_sub[SUBMIT_TARGET_COL].values
+lgb_test = lgb_sub[SUBMIT_TARGET_COL].values
 
 # =========================================================
 # 13. submission 생성
@@ -388,8 +388,8 @@ for name, weights in sub_save_specs:
     pred_test = weighted_sum(weights, xgb_test, cat_test, lgb_test)
 
     submission = pd.DataFrame({
-        ID_COL: xgb_sub[ID_COL].values,
-        TARGET_COL: pred_test,
+        SUBMIT_ID_COL: xgb_sub[SUBMIT_ID_COL].values,
+        SUBMIT_TARGET_COL: pred_test,
     })
 
     path = os.path.join(OUTPUT_DIR, f"{name}_submission.csv")

@@ -1,518 +1,779 @@
-# 🧬 AI for Infertility Treatment
-## Pregnancy Success Prediction using Machine Learning
+<div align="center">
  
-난임 환자 데이터를 기반으로 **임신 성공 여부를 예측하는 AI 모델**을 개발하는 프로젝트입니다.
+# 🧬 난임 치료를 위한 AI 모델
+## 임신 성공 예측 — Machine Learning 기반
  
-난임은 전 세계적으로 증가하는 중요한 의료 문제로, 많은 환자들이 치료 과정에서 **신체적·정신적 부담과 높은 비용**을 경험합니다.  
-따라서 **최소한의 시술로 임신 성공 가능성을 높이는 것**은 매우 중요한 의료 목표입니다.
+<br>
  
-본 프로젝트는 난임 시술 데이터를 활용하여 **임신 성공 여부를 예측**하고  
-임신 성공에 영향을 미치는 **핵심 특성(feature)** 을 탐색하는 것을 목표로 합니다.
+[![Python](https://img.shields.io/badge/Python-3.10-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![XGBoost](https://img.shields.io/badge/XGBoost-3.2.0-FF6600?style=for-the-badge)](https://xgboost.readthedocs.io)
+[![CatBoost](https://img.shields.io/badge/CatBoost-최신버전-FFCC00?style=for-the-badge)](https://catboost.ai)
+[![LightGBM](https://img.shields.io/badge/LightGBM-최신버전-2ECC71?style=for-the-badge)](https://lightgbm.readthedocs.io)
  
-AI 기반 예측 모델은 의료진의 **데이터 기반 의사결정 지원**과 환자 맞춤형 치료 전략 수립에 기여할 수 있습니다.
+<br>
+ 
+### 🏆 리더보드 점수
+ 
+# `ROC-AUC : 0.74218`
+ 
+<br>
+ 
+</div>
  
 ---
  
-## 🏆 Hackathon Objective
+## 📌 프로젝트 개요
  
-- 난임 환자 데이터 분석
-- 임신 성공 여부 예측 모델 개발
-- 임신 성공에 영향을 미치는 핵심 특성 탐색
+> 난임 환자 데이터를 기반으로 **임신 성공 여부를 예측하는 AI 모델**을 개발하는 프로젝트입니다.
+ 
+난임은 전 세계적으로 증가하는 중요한 의료 문제로,  
+많은 환자들이 치료 과정에서 **신체적·정신적 부담과 높은 비용**을 경험합니다.
+ 
+**최소한의 시술로 임신 성공 가능성을 높이는 것**은 매우 중요한 의료 목표이며,  
+본 프로젝트는 AI 기반 예측 모델을 통해 **데이터 기반 의사결정 지원**에 기여하고자 합니다.
+ 
+<br>
+ 
+| 🎯 과제 | 🏥 도메인 | ✅ 검증 방법 | 📏 평가 지표 |
+|:---:|:---:|:---:|:---:|
+| 임신 성공 여부 예측 | 난임 시술 (보조생식술) | Stratified K-Fold (5-Fold) | ROC-AUC |
+ 
+<br>
  
 ---
  
-## 📊 Project Overview
+## 🏅 성능 요약
+ 
+<div align="center">
+ 
+| 모델 | XGB 버전 | OOF ROC-AUC | 리더보드 |
+|:---:|:---:|:---:|:---:|
+| XGBoost v2 reg_relax — Day2 단일 기준 | xgb v2 | 0.74011 | — |
+| XGBoost Optuna v1 — 단일 최고 | xgb optuna | 0.74016 | — |
+| Probability Weighted Ensemble — OOF 최고 | xgb optuna | 0.740482 | — |
+| 🥇 **Rank Ensemble — 최종 제출 모델** | xgb v2 | 0.740448 | **0.74218** |
+| ⭐ **Rank Ensemble — 최신 재실험 최고** | xgb optuna | **0.740487** | — |
+ 
+</div>
+ 
+<br>
+ 
+> 💡 **최종 제출 모델 기준**  
+> OOF ROC-AUC: **0.740448**  
+> Public LB: **0.74218**  
+> → OOF 대비 **+0.00173 상승**, 과적합 없이 안정적으로 일반화됨을 확인
+ 
+> 💡 **최신 내부 검증 최고 모델 기준**  
+> Probability Weighted Baseline: **0.740444**  
+> Rank Weighted Ensemble: **0.740487**  
+> → Baseline 대비 **+0.000043**
+ 
+<br>
+ 
+---
+ 
+## 🏗️ 모델 구조
+ 
+```text
+┌────────────────────────────────────────────────────────────┐
+│                        기본 모델 층                         │
+├────────────────────────────────────────────────────────────┤
+│  🔵 XGBoost v2 (reg_relax)   : 0.74011                    │
+│  🔵 XGBoost Optuna v1        : 0.74016                    │
+│  🟠 CatBoost v2              : 0.74005                    │
+│  🟢 LightGBM v1              : 0.73987                    │
+└────────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+┌────────────────────────────────────────────────────────────┐
+│                     Ensemble 실험 층                        │
+├────────────────────────────────────────────────────────────┤
+│  v1  XGB v2 + CAT                      → 0.740381         │
+│  v2  3모델 Probability Ensemble        → 0.740444         │
+│  v2* 3모델 Probability Ensemble        → 0.740482         │
+│      (XGB Optuna 반영)                                     │
+│  v3  Stacking (LogisticRegression)     → 0.740128 ❌       │
+│  v4  Rank Ensemble (XGB v2)            → 0.740448         │
+│      └─ Public LB                      → 0.74218 ✅        │
+│  v4* Rank Ensemble (XGB Optuna)        → 0.740487 ⭐       │
+└────────────────────────────────────────────────────────────┘
+```
+ 
+> `*` 표시는 동일한 Ensemble 구조를 XGBoost Optuna 버전으로 재실행한 결과를 의미한다.
+ 
+<br>
+ 
+### 모델 선정 이유
+ 
+| 모델 | 선정 이유 | 비고 |
+|:---:|---|---|
+| 🔵 **XGBoost** | 표 형식 의료 데이터에서 강한 기본 성능 | reg_relax, Optuna 모두 실험 |
+| 🟠 **CatBoost** | 범주형 처리 강점 + Ensemble Diversity 기여 최대 | 가중치가 꾸준히 높게 나옴 |
+| 🟢 **LightGBM** | Leaf-wise Split으로 다른 예측 패턴 제공 | 빠른 학습 속도 |
+| 📊 **Rank Ensemble** | Probability Calibration 차이를 줄여 안정적 결합 | 최신 내부 검증 최고 성능 |
+ 
+<br>
+ 
+---
+ 
+## 🔎 검증 전략
+ 
+```
+전체 학습 데이터 (N개 샘플)
+          │
+          ▼
+  Stratified K-Fold (5-Fold)
+  → Class Imbalance 대응
+  → Fold 간 클래스 비율 유지
+          │
+    ┌─────┼─────┬─────┬─────┐
+    ▼     ▼     ▼     ▼     ▼
+  Fold1 Fold2 Fold3 Fold4 Fold5
+    └─────┴─────┴─────┴─────┘
+                  │
+                  ▼
+      OOF Prediction (전체 데이터 커버)
+                  │
+                  ▼
+        OOF ROC-AUC 계산
+      + Ensemble Meta Feature 재활용
+```
  
 | 항목 | 내용 |
 |------|------|
-| Task | 난임 시술 후 임신 성공 여부 예측 |
-| Domain | Infertility Treatment (ART) |
-| Model | XGBoost → Ensemble |
-| Validation | Stratified K-Fold (5 folds) |
-| Evaluation Metric | ROC-AUC / PR-AUC |
+| ✅ 선택 이유 | Class Imbalance 대응, Fold 간 클래스 비율 유지 |
+| 📈 장점 | 안정적 검증 + OOF로 Ensemble / Stacking 재활용 가능 |
  
----
- 
-## 🧠 Model
- 
-### 모델 구성
- 
-| Model | Version |
-|-------|---------|
-| XGBoost | reg_relax tuned |
-| CatBoost | baseline v2 |
-| LightGBM | baseline v1 |
-| Rank Ensemble | weighted |
- 
-### 선정 이유
- 
-- **XGBoost**: tabular 의료 데이터에서 높은 baseline 성능
-- **CatBoost**: 범주형/분포 차이에 강하고 ensemble diversity 기여
-- **LightGBM**: leaf-wise split 기반의 다른 예측 패턴 제공
-- **Rank Ensemble**: probability calibration 차이를 줄이며 안정적인 결합 가능
- 
-### 📊 Model Performance
- 
-| Metric | Score |
-|--------|-------|
-| Best Single Model (XGBoost v2) ROC-AUC | **0.74011** |
-| Best Ensemble OOF ROC-AUC | **0.740448** |
-| Public Leaderboard | **0.74218** |
- 
----
- 
-## 🔎 Validation Strategy
- 
-### 방법
- 
-- Stratified K-Fold (5 folds)
-- OOF Prediction
- 
-### 선정 이유
- 
-- 데이터에 class imbalance 존재
-- Fold 간 class 비율 유지
-- 안정적인 validation 성능 확보
-- OOF 기반으로 ensemble 실험의 일반화 성능 검증 가능
+<br>
  
 ---
  
 ## ⚙️ Feature Engineering
  
-난임 치료 도메인 지식을 기반으로 **30+ 파생 변수 생성**
+> 🏥 난임 치료 도메인 지식을 기반으로 **30개 이상의 파생 변수** 생성
  
-### 🧪 Embryo Process Efficiency
+<br>
  
-난자 → 배아 → 이식 과정의 효율 반영
+### 🧪 A. 배아 처리 단계별 전환율
+*난자 → 배아 → 이식으로 이어지는 보조생식술 과정의 단계별 전환율*
  
-| Feature | 설명 |
-|---------|------|
-| 배아생성효율 | 수집 난자 대비 생성 배아 수 |
-| ICSI수정효율 | 미세주입 난자 대비 배아 생성 수 |
-| 배아이식비율 | 생성 배아 중 이식된 비율 |
-| 배아저장비율 | 생성 배아 중 저장된 비율 |
-| 난자활용률 | 수집 난자 중 ICSI에 활용된 비율 |
+| Feature | 계산식 | 의미 |
+|---------|------|------|
+| 배아생성효율 | 생성 배아 / 수집 난자 | 실험실 수정 품질 |
+| ICSI수정효율 | 배아 생성 / 미세주입 난자 | ICSI 성공률 |
+| 배아이식비율 | 이식 배아 / 총 생성 배아 | 이식 활용도 |
+| 배아저장비율 | 저장 배아 / 총 생성 배아 | 잉여 배아 지표 |
+| 난자활용률 | 미세주입 난자 / 수집 난자 | 전체 난자 활용도 |
  
-### 📊 Treatment History
+<br>
  
-과거 시술 이력 기반 성공 확률 반영
+### 📋 B. 과거 시술 이력
+*과거 시술 이력 기반 성공 확률 반영*
  
-| Feature | 설명 |
-|---------|------|
-| 전체임신률 | 총 시술 대비 임신 성공 비율 |
-| IVF임신률 | IVF 시술 대비 임신 성공 비율 |
-| DI임신률 | DI 시술 대비 임신 성공 비율 |
-| 임신유지율 | 임신 대비 출산 성공 비율 |
+| Feature | 계산식 | 의미 |
+|---------|------|------|
+| 전체임신률 | 총 임신 / 총 시술 | 전체 누적 성공률 |
+| IVF임신률 | IVF 임신 / IVF 시술 | IVF 특이적 성공률 |
+| DI임신률 | DI 임신 / DI 시술 | DI 특이적 성공률 |
+| 임신유지율 | 총 출산 / 총 임신 | 임신 → 출산 유지율 |
+| 클리닉집중도 | 클리닉 내 시술 / 총 시술 | 치료 연속성 지표 |
  
-### ⚠️ Failure Pattern
+<br>
  
-반복 실패 패턴 반영
+### ⚠️ C. 반복 실패 패턴
+*임상적으로 독립적인 불량 예후 인자*
  
-| Feature | 설명 |
-|---------|------|
-| 총실패횟수 | 총 시술 - 총 임신 횟수 |
-| IVF실패횟수 | IVF 시술 - IVF 임신 횟수 |
-| 반복IVF실패 여부 | IVF 실패 ≥ 3회 여부 (binary) |
+| Feature | 기준 | 임상적 의미 |
+|---------|:----:|------------|
+| 총실패횟수 | 시술 - 임신 | 전체 누적 실패 |
+| IVF실패횟수 | IVF 시술 - IVF 임신 | IVF 특이적 실패 |
+| 반복IVF실패 여부 | **≥ 3회** (Binary) | ⚠️ RIF 진단 기준 |
  
-> 특히 **IVF 실패 ≥ 3** 은 중요한 임상 위험 요인입니다.
+> 🔴 **RIF (Recurrent Implantation Failure)**: IVF 실패 3회 이상은 임상 가이드라인상 독립적 불량 예후 인자로 분류
  
-### 👩‍⚕️ Age Risk Features
+<br>
  
-| Feature | 설명 |
-|---------|------|
-| 나이 | 시술 당시 나이 (수치형 변환) |
-| 나이² | 비선형 나이 효과 포착 |
-| 고령 여부 | 35세 이상 binary |
-| 초고령 여부 | 40세 이상 binary |
-| 극고령 여부 | 42세 이상 binary |
+### 👩‍⚕️ D. 나이 기반 위험도
+*난임 치료에서 가장 중요한 단일 변수*
  
-### 🔗 Interaction Features
+| Feature | 기준 | 임상적 의미 |
+|---------|:----:|:------------:|
+| 나이 | 연속형 | 기본 나이 정보 |
+| 나이² | — | 비선형 나이 효과 포착 |
+| 고령 여부 | **≥ 35세** | 고령 임신 기준선 |
+| 초고령 여부 | **≥ 40세** | 성공률 급락 구간 |
+| 극고령 여부 | **≥ 42세** | 건강보험 급여 상한 근방 |
  
-| Feature | 설명 |
-|---------|------|
-| 나이 × 시술횟수 | 고령 + 반복 시술 복합 지표 |
-| 나이 × IVF실패 | 고령 + 반복 실패 복합 지표 |
-| 나이 × IVF임신률 | 고령이지만 성공 경험이 있는 경우 |
+<br>
+ 
+### 🔗 E. Interaction Feature
+*단순 Feature보다 복합적인 환자 상태 반영*
+ 
+| Feature | 조합 | 포착하는 효과 |
+|---------|------|--------------|
+| 나이 × 시술횟수 | 고령 + 반복 시술 | 예후 악화 복합 지표 |
+| 나이 × IVF실패 | 고령 + 반복 실패 | 가장 불량한 예후 집단 |
+| 나이 × IVF임신률 | 고령 + 성공 경험 | 상대적 양호 집단 식별 |
+| 초고령 × 반복실패 | Binary 교차 | RIF + 고령 복합 위험 |
+ 
+<br>
+ 
+### 📊 Feature Engineering 요약
+ 
+| Feature 그룹 | 변수 수 | 핵심 기여 |
+|:---:|:---:|---|
+| 🧪 배아 처리 효율 | 7개 | 실험실 품질 정보 |
+| 📋 과거 시술 이력 | 8개 | 과거 성공 이력 |
+| ⚠️ 반복 실패 패턴 | 3개 | 반복 실패 위험 |
+| 👩‍⚕️ 나이 위험도 | 5개 | 나이 임계점 효과 |
+| 🔗 Interaction | 4개 | 복합 위험 포착 |
+| **합계** | **30개 이상** | |
+ 
+<br>
  
 ---
  
-## 📅 Experiments
+## 📅 실험 기록
  
-### Day1 — Baseline Model (v1)
+---
  
-#### Model Parameters
+### 🗓️ Day 1 — XGBoost 기본 모델
+ 
+**목표**: 표 형식 의료 데이터에서 XGBoost 기반 기본 성능 확인
  
 ```python
-n_estimators     = 3000
-learning_rate    = 0.02
-max_depth        = 5
-min_child_weight = 5
-gamma            = 0.1
-subsample        = 0.8
-colsample_bytree = 0.7
-reg_alpha        = 0.1
-reg_lambda       = 1.5
+n_estimators          = 3000
+learning_rate         = 0.02
+max_depth             = 5
+min_child_weight      = 5
+gamma                 = 0.1
+subsample             = 0.8
+colsample_bytree      = 0.7
+reg_alpha             = 0.1
+reg_lambda            = 1.5
+early_stopping_rounds = 50
 ```
  
-#### Result
- 
-| Metric | Score |
-|--------|-------|
+| 지표 | 점수 |
+|:------:|:-----:|
 | ROC-AUC | 0.73997 |
 | PR-AUC | 0.4505 |
  
-> Baseline 성능: ROC-AUC ≈ 0.74
+> ✅ 기본 모델만으로도 ROC-AUC ≈ **0.74** 수준의 강한 기본 성능 확보
+ 
+<br>
  
 ---
  
-### Day2 — Model Tuning (v2)
+### 🗓️ Day 2 — Regularization 튜닝
  
-#### Experiment Framework
+**목표**: 파라미터 튜닝으로 단일 모델 성능 극대화
  
-실험 구성은 아래 6가지 설정을 비교하였으며, 결과는 자동으로 로그에 기록되었다.
+**실험 구성**
  
 ```
-baseline / depth_up / lr_down / reg_relax / sampling / best_combo
-→ xgb_v2_results_log.csv
+기본값 → 깊이 증가 → 학습률 감소 → Regularization 완화 → Sampling 조정 → 최적 조합
+→ 결과 자동 기록: xgb_v2_results_log.csv
 ```
  
-#### Regularization Relaxation
+**Regularization Relaxation 전략**
  
-| Parameter | Baseline | v2 |
-|-----------|----------|----|
-| min_child_weight | 5 | 3 |
-| gamma | 0.1 | 0 |
-| reg_alpha | 0.1 | 0 |
-| reg_lambda | 1.5 | 1 |
+| 파라미터 | 기본값 | → | v2 | 변경 의도 |
+|-----------|:--------:|:-:|:--:|----------|
+| min_child_weight | 5 | → | **3** | 더 작은 Leaf 허용 |
+| gamma | 0.1 | → | **0** | Split 최소 이득 기준 완화 |
+| reg_alpha | 0.1 | → | **0** | L1 Regularization 완화 |
+| reg_lambda | 1.5 | → | **1** | L2 Regularization 완화 |
  
-#### Result
+| 지표 | v1 기본값 | v2 reg_relax | 개선 |
+|:------:|:-----------:|:------------:|:----:|
+| ROC-AUC | 0.73997 | **0.74011** | +0.00014 ✅ |
+| PR-AUC | 0.45050 | **0.45054** | +0.00004 |
  
-| Metric | Score |
-|--------|-------|
-| ROC-AUC | 0.74011 |
-| PR-AUC | 0.45054 |
+> 💡 과도한 Regularization이 Feature Interaction 학습을 제한했을 가능성  
+> → **XGBoost v2 (reg_relax)** 를 초기 단일 모델 기준으로 선정
  
-#### 해석
- 
-Regularization을 완화했을 때 성능이 소폭 상승하였다.  
-이는 현재 데이터에서 과도한 규제가 오히려 feature interaction 학습을 제한했을 가능성을 시사한다.  
- 
-> 따라서 Day2에서는 **XGBoost v2 (reg_relax)** 를 최적 단일 모델로 선정하였다.
+<br>
  
 ---
  
-### Day3 — Single Model Saturation and Ensemble Optimization
+### 🗓️ Day 3 — 다중 모델 구성 및 Ensemble 최적화
  
-Day3에서는 Day1~Day2에서 진행한 XGBoost 중심 반복 실험 결과를 재정리하고,  
-단일 모델 성능이 일정 수준에서 포화(saturation)되는 패턴을 확인한 뒤  
-성능 개선 전략을 **single model tuning → ensemble optimization** 방향으로 확장하였다.
+**목표**: 다중 모델 구성 및 Ensemble 전략으로 성능 향상
  
-**핵심 목표**
+<br>
  
-- XGBoost 실험 버전별 성능 흐름 정리
-- feature engineering 확장의 실제 효과 재해석
-- 왜 XGBoost v2(reg_relax)를 최종 단일 모델로 선택했는지 설명
-- 왜 ensemble로 방향을 전환했는지 근거 제시
-- Stacking, Probability Ensemble, Rank Ensemble을 비교하고 다음 단계 전략 결정
+#### 📋 Day 3 실험 전체 순서
  
-#### 1. Why XGBoost First?
+| 순서 | 파일 | 내용 | 결과 |
+|:---:|------|------|:----:|
+| 1 | `catboost_kfold_v2.py` | CatBoost 기본 모델 학습 | 0.74005 |
+| 2 | `ensemble_v1.py` | XGB v2 + CAT 2모델 Ensemble | 0.740381 |
+| 3 | `lightgbm_kfold_v1.py` | LightGBM 기본 모델 학습 | 0.73987 |
+| 4 | `ensemble_v2.py` (1차) | 3모델 Probability Ensemble (XGB v2) | 0.740444 |
+| 5 | `xgb_kfold_v3.py` | Feature Engineering 확장 | 하락 |
+| 6 | `xgb_kfold_v4.py` | Feature 일부 제거 | 0.74003 |
+| 7 | `xgb_optuna_v1.py` | Optuna Hyperparameter 탐색 | **0.74016** |
+| 8 | `ensemble_v2.py` (2차) | 3모델 Probability Ensemble (XGB Optuna) | **0.740482** |
+| 9 | `xgb_kfold_v5_branch.py` | IVF/DI Branch Feature 추가 | 0.740036 |
+| 10 | `ensemble_baseline_search.py` | Weight Grid Search (XGB v2 기준) | 0.740444 |
+| 11 | `ensemble_v3_stacking.py` (1차) | Stacking (기존 XGB 버전) | 0.740050 |
+| 12 | `ensemble_v4_rank_ensemble.py` (1차) | Rank Ensemble (XGB v2) | **0.740448 / LB 0.74218** |
+| 13 | `ensemble_v3_stacking.py` (2차) | Stacking 재실험 (XGB Optuna) | 0.740128 |
+| 14 | `ensemble_v4_rank_ensemble.py` (2차) | Rank Ensemble 재실험 (XGB Optuna) | **0.740487** ⭐ |
  
-프로젝트 초기에는 XGBoost를 중심 모델(base model)로 설정하였다.
+<br>
  
-**선정 이유**
+#### 1️⃣ CatBoost v2 학습
  
-- 의료 데이터와 같은 tabular dataset에서 강한 baseline 성능
-- 비선형 관계와 feature interaction 학습에 강점
-- 비교적 해석 가능한 feature importance 제공
-- 반복 실험과 tuning 속도가 빠르며 baseline 구축 효율이 높음
+```python
+# catboost_kfold_v2.py
+iterations     = 5000
+learning_rate  = 0.03
+depth          = 6
+l2_leaf_reg    = 5.0
+```
  
-> 즉, Day1~Day2 구간에서는 XGBoost를 기준 모델로 삼아  
-> 데이터가 도달할 수 있는 성능 상한선을 먼저 확인하는 전략을 사용하였다.
+| 지표 | 점수 |
+|:------:|:-----:|
+| ROC-AUC | 0.74005 |
  
-#### 2. XGBoost Experiment History
+> 목적: XGBoost 외 모델 기본 성능 확보 + Ensemble Diversity 탐색
  
-| Version | Experiment | Description | OOF ROC-AUC |
-|---------|------------|-------------|-------------|
-| v1 | baseline | 기본 파라미터 기반 초기 모델 | 0.73997 |
-| v2 | reg_relax | Regularization 완화 튜닝 | **0.74011** |
-| v3 | reg_relax_feat_plus | 파생변수 확장 | 0.73998 |
-| v4 | reg_relax_feat_lite | 파생변수 일부 정리 | 0.74003 |
-| v5 | optuna_branch_v5_dedup | Optuna + branch feature + dedup | 0.74004 |
+<br>
  
-**해석**
+#### 2️⃣ ensemble_v1 — XGB v2 + CatBoost (2-Model)
  
-- 초기 baseline 대비 tuning은 유효
-- 그러나 추가 feature engineering 확장 효과는 제한적
-- 복잡한 파생변수 및 branch feature 추가가 반드시 성능 향상으로 이어지지는 않음
-- **Day3 시점에서 가장 강한 XGBoost 단일 모델은 v2(reg_relax)**
+```
+구성: XGBoost v2 reg_relax + CatBoost v2
+방법: Probability Weighted Average
+```
  
-#### 3. What Was Tested in XGBoost?
+| Ensemble | 가중치 (XGB/CAT) | OOF ROC-AUC |
+|----------|:-----------------:|:-----------:|
+| Equal | 0.50 / 0.50 | 0.740380 |
+| Best Grid | 0.52 / 0.48 | 0.740381 |
  
-##### 3.1 Baseline (v1)
+> ✅ 2모델만으로도 단일 모델 대비 향상 확인 → **3모델 구성으로 확장**
  
-| Metric | Score |
+<br>
+ 
+#### 3️⃣ LightGBM v1 학습
+ 
+```python
+# lightgbm_kfold_v1.py
+n_estimators   = 3000
+learning_rate  = 0.02
+num_leaves     = 31
+```
+ 
+| 지표 | 점수 |
+|:------:|:-----:|
+| ROC-AUC | 0.73987 |
+ 
+> 목적: 3모델 Ensemble 구성 완성
+ 
+<br>
+ 
+#### 4️⃣ ensemble_v2 (1차) — 3모델 Probability Ensemble (XGB v2)
+ 
+```
+구성: XGBoost v2 + CatBoost v2 + LightGBM v1
+방법: Probability Weighted Average (Grid Search, step=0.02)
+```
+ 
+**2모델 Pair 비교**
+ 
+| 조합 | OOF ROC-AUC |
+|------|:-----------:|
+| XGB + CAT (0.5/0.5) | 0.740380 |
+| XGB + LGB (0.5/0.5) | 0.740237 |
+| CAT + LGB (0.5/0.5) | 0.740369 |
+ 
+**3모델 결과**
+ 
+| Ensemble | 가중치 (XGB/CAT/LGB) | OOF ROC-AUC |
+|----------|-----------------------|:-----------:|
+| Equal | 0.33 / 0.33 / 0.33 | 0.740436 |
+| **Weighted** | **0.33 / 0.40 / 0.27** | **0.740444** |
+ 
+**예측 상관계수**
+ 
+| 조합 | 상관계수 |
+|------|:--------:|
+| XGB-CAT | 0.9950 |
+| XGB-LGB | 0.9959 |
+| CAT-LGB | 0.9930 |
+ 
+> ⚠️ 세 모델 모두 상관계수 0.99 이상 → Diversity 확보를 위해 추가 탐색 필요
+ 
+<br>
+ 
+#### 5️⃣ XGBoost Feature Engineering 실험 (v3, v4)
+ 
+| 파일 | 내용 | OOF ROC-AUC | v2 대비 |
+|------|------|:-----------:|:-----:|
+| xgb_kfold_v3.py | Feature 대폭 확장 | 0.73998 | -0.00013 ❌ |
+| xgb_kfold_v4.py | Feature 일부 정리 | 0.74003 | -0.00008 ❌ |
+ 
+> ⚠️ Feature 추가/정리 모두 v2 미달 → **XGBoost Single Model Feature Saturation 판단**
+ 
+<br>
+ 
+#### 6️⃣ XGBoost Optuna 튜닝
+ 
+```python
+# xgb_optuna_v1.py
+N_TRIALS = 30
+탐색 파라미터: learning_rate, max_depth, min_child_weight,
+              gamma, subsample, colsample_bytree, reg_alpha, reg_lambda
+```
+ 
+| 모델 | OOF ROC-AUC | v2 reg_relax 대비 |
+|------|:-----------:|:---------------:|
+| XGB v2 reg_relax | 0.74011 | — |
+| **XGB Optuna v1** | **0.74016** | **+0.00005 ✅** |
+ 
+> 💡 Optuna로 소폭 향상 확인 → **Ensemble v2 재실행에 적용**
+ 
+<br>
+ 
+#### 7️⃣ ensemble_v2 (2차) — 3모델 Probability Ensemble (XGB Optuna)
+ 
+```
+구성: XGBoost Optuna v1 + CatBoost v2 + LightGBM v1
+XGB 버전 변경: xgb_v2_reg_relax → xgb_optuna_v1
+```
+ 
+| Ensemble | 가중치 (XGB/CAT/LGB) | OOF ROC-AUC |
+|----------|-----------------------|:-----------:|
+| **Weighted** | **0.40 / 0.40 / 0.20** | **0.740482** ⭐ |
+ 
+> 🏆 **Day 3 Probability Ensemble 기준 최고 성능**
+ 
+<br>
+ 
+#### 8️⃣ XGBoost v5 Branch Feature
+ 
+```python
+# xgb_kfold_v5_branch.py
+# IVF / DI Branch Feature 추가 + Optuna Best Params 적용
+```
+ 
+| 지표 | 점수 | Optuna 대비 |
+|:------:|:-----:|:---------:|
+| ROC-AUC | 0.740036 | -0.00012 ❌ |
+ 
+> ⚠️ Branch Feature 추가에도 성능 하락 → Single Model 방향 포기
+ 
+<br>
+ 
+#### 9️⃣ ensemble_baseline_search.py — Weight Grid Search
+ 
+```
+목적: 3모델 최적 가중치 재탐색
+구성: XGB v2 reg_relax + CatBoost v2 + LightGBM v1
+```
+ 
+| 지표 | 값 |
 |--------|-------|
-| ROC-AUC | 0.73997 |
-| PR-AUC | 0.45050 |
+| Best Weighted AUC | 0.740444 |
+| Best Weights | XGB 0.33 / CAT 0.40 / LGB 0.27 |
  
-> 기본 모델만으로도 ROC-AUC 약 0.74 수준의 강한 baseline을 확보하였다.
+> ⚠️ **실험 로그 누락 이슈**  
+> 이 시점에서 xgb_optuna_v1 결과가 실험 로그에 기록되지 않아  
+> XGB v2 reg_relax(0.74011)를 최고 단일 모델로 착각한 채 진행됨  
+> → 이후 Ensemble v4 (1차)는 XGB v2 기준으로 실행됨
  
-##### 3.2 Regularization Relaxation (v2)
+<br>
  
-| Metric | Score |
-|--------|-------|
-| ROC-AUC | 0.74011 |
-| PR-AUC | 0.45054 |
+#### 🔟 ensemble_v3 — Stacking (Logistic Regression Meta Model, 재실험 반영)
  
-> Regularization 완화 시 성능 소폭 상승 → 현재 데이터에서 과도한 규제가 interaction 학습을 제한했을 가능성
+```text
+Meta Features (13개):
+  기본값: xgb_pred, cat_pred, lgb_pred
+  통계량: pred_mean, pred_std, pred_max, pred_min
+  차이값: xgb_cat_gap, xgb_lgb_gap, cat_lgb_gap
+  Flag  : xgb_is_max, cat_is_max, lgb_is_max
  
-##### 3.3 Feature Expansion (v3)
- 
-| Metric | Score |
-|--------|-------|
-| ROC-AUC | 0.73998 |
- 
-> Feature를 더 추가했지만 성능은 오히려 소폭 하락  
-> 기존 feature set이 이미 충분히 강력하고, 추가 feature가 noise에 가까울 수 있음
- 
-##### 3.4 Lite Feature Set (v4)
- 
-| Metric | Score |
-|--------|-------|
-| ROC-AUC | 0.74003 |
- 
-> feature를 일부 정리했을 때 성능이 약간 회복되었으나 v2를 넘지는 못함  
-> **feature를 많이 넣는 것보다 핵심 feature를 유지하는 것이 더 중요**
- 
-##### 3.5 Optuna + Branch Feature (v5)
- 
-| Metric | Score |
-|--------|-------|
-| ROC-AUC | 0.74004 |
-| PR-AUC | 0.45062 |
- 
-> Optuna tuning과 branch feature 확장에도 불구하고 v2를 넘지 못함  
-> **→ single model 성능이 포화 상태에 근접했다고 판단**
- 
-#### 4. Why Was XGBoost v2 Selected?
- 
-| 선택 이유 |
-|-----------|
-| 가장 높은 OOF ROC-AUC |
-| 실험 구조가 비교적 단순하고 해석 가능성이 높음 |
-| 과도한 feature expansion 없이 안정적인 성능 |
-| ensemble의 base model로 사용하기 적합 |
-| 복잡한 branch feature 없이도 가장 높은 성능 달성 |
- 
-#### 5. Feature Engineering Analysis
- 
-##### Feature Engineering Result Summary
- 
-| Feature Set | ROC-AUC |
-|-------------|---------|
-| baseline + 주요 파생변수 | 0.74011 |
-| 추가 feature 확장 | 0.73998 |
-| 일부 feature 정리 | 0.74003 |
-| branch + optuna | 0.74004 |
- 
-**해석**
- 
-- Feature engineering은 초기 단계에서는 분명 성능 개선에 기여
-- 그러나 Day3 시점에서는 추가 확장의 성능 향상이 거의 없음
-- 일부 실험에서는 오히려 noise가 증가
- 
-> **Feature engineering은 이미 1차 포화 구간에 도달했고,**  
-> **추가 성능 향상은 ensemble에서 찾는 것이 더 효율적이다.**
- 
-#### 6. Why Move to Ensemble?
- 
-| Model | ROC-AUC |
-|-------|---------|
-| XGBoost (v2 reg_relax) | 0.74011 |
-| CatBoost v2 | 0.74005 |
-| LightGBM v1 | 0.73987 |
- 
-**해석**
- 
-- 세 모델의 성능이 거의 유사함
-- 각 모델은 비슷한 수준의 예측력을 가짐
-- 그러나 학습 방식이 다르기 때문에 오차 패턴(error pattern)이 다를 가능성이 있음
- 
-> 단일 모델을 더 미세하게 튜닝하기보다  
-> 서로 다른 모델을 결합하는 것이 성능 향상에 더 유리하다고 판단
- 
-**주목할 점**
- 
-- CatBoost 단일 성능은 XGBoost보다 약간 낮았음
-- 그러나 ensemble weight에서는 CatBoost 비중이 가장 높게 나옴
-- **→ CatBoost가 단일 성능 이상으로 ensemble diversity에 기여하고 있음을 의미**
- 
-#### 7. Ensemble Experiment Flow
- 
-##### 7.1 Stacking (First Trial)
- 
-LogisticRegression을 meta model로 적용하여 base model OOF prediction을 결합하였다.
- 
-**Result**: Stacking은 weighted / rank ensemble을 넘지 못하였다.
- 
-> 현재 base model 조합에서는 복잡한 meta model보다  
-> 단순하고 안정적인 ensemble 방식이 더 적합한 것으로 판단
-> 
-> **Weighted / Rank Ensemble > Stacking**
- 
-##### 7.2 Probability Ensemble
- 
-```
-final_pred = w1 × xgb_prob + w2 × cat_prob + w3 × lgb_prob
+Meta Model: LogisticRegression
+C 후보: [1.0, 0.3, 0.1, 0.03, 0.01]
+XGB 버전: xgb_optuna_v1 기준 재실험
 ```
  
-| Ensemble | ROC-AUC |
-|----------|---------|
-| Equal Ensemble | 0.740436 |
-| Weighted Ensemble | 0.740444 |
+| 항목 | 값 |
+|------|-----|
+| Baseline AUC | 0.740440 |
+| Best Stacking OOF AUC | 0.740128 |
+| Gain vs Baseline | -0.000312 |
+| Best Single AUC | 0.740160 |
+| Equal Ensemble AUC | 0.740466 |
+| Best C | 1.0 |
+| Mean AUC ± Std | 0.740148 ± 0.001839 |
  
-**Best weights**
+> ❌ XGB Optuna 기준으로 다시 실험했음에도 Stacking은 Baseline Ensemble을 넘지 못했다.  
+> 현재 Base Model 조합에서 Meta Model이 학습할 추가적인 Diversity가 부족하며,  
+> 단순 Weighted / Rank Ensemble이 더 안정적으로 작동함을 시사한다.
  
-```
-XGB : 0.33
-CAT : 0.40
-LGB : 0.27
-```
+<br>
  
-##### 7.3 Rank Ensemble
+#### 1️⃣1️⃣ ensemble_v4 — Rank Ensemble
  
-```
-1. 각 모델 예측값 → percentile rank 변환
-2. rank를 가중 평균
-```
+##### (1) 제출 버전 — XGB v2 기준 📤
  
-**Why Needed?**
- 
-Tree 기반 모델은 probability scale이 서로 다를 수 있다.  
-Rank ensemble은 상대적 ordering을 중심으로 결합하기 때문에 calibration 차이에 더 안정적이다.
- 
-| Ensemble | ROC-AUC |
-|----------|---------|
-| Rank Ensemble | **0.740448** |
- 
-**Best weights**
- 
-```
-XGB : 0.33
-CAT : 0.41
-LGB : 0.26
+```text
+구성: XGBoost v2 reg_relax + CatBoost v2 + LightGBM v1
+방법: Percentile Rank 변환 후 Weighted Average
+Baseline: 0.740444
 ```
  
-##### Ensemble Step-by-Step Summary
- 
-| Step | Method | ROC-AUC |
-|------|--------|---------|
-| 1 | Stacking (LR meta model) | < baseline |
-| 2 | Equal Probability Ensemble | 0.740436 |
-| 3 | Weighted Probability Ensemble | 0.740444 |
-| 4 | **Rank Ensemble** | **0.740448** |
- 
-#### 8. Final Day3 Model
- 
-> **Best Day3 Model: Rank Ensemble**
- 
-| 구성 | 내용 |
-|------|------|
-| Base Models | XGB reg_relax / CatBoost v2 / LightGBM v1 |
-| Weights | 0.33 / 0.41 / 0.26 |
-| Method | Percentile Rank Weighted Average |
- 
-| Metric | Score |
-|--------|-------|
-| OOF ROC-AUC | 0.740448 |
-| Public LB | **0.74218** |
- 
-> OOF보다 Public LB가 높게 나타났으며  
-> 이는 모델이 **과적합 없이 안정적으로 일반화**되고 있음을 시사한다.
- 
-#### 9. Why CatBoost Tuning Was Chosen as Next Step
- 
-**현재 상태**
- 
-```
-XGB 0.74011  ← Optuna tuned
-CAT 0.74005  ← baseline (여유 있음)
-LGB 0.73987  ← baseline (여유 있음)
+```python
+xgb_rank = rank(xgb_prob, method="average", pct=True)
+cat_rank = rank(cat_prob, method="average", pct=True)
+lgb_rank = rank(lgb_prob, method="average", pct=True)
+final_pred = w_xgb × xgb_rank + w_cat × cat_rank + w_lgb × lgb_rank
 ```
  
-- Hybrid Ensemble / Fine Search → **현재 ceiling 안에서의 미세 최적화**
-- CatBoost tuning → **ensemble ceiling 자체를 올릴 수 있는 작업**
+| Ensemble | 가중치 (XGB/CAT/LGB) | OOF ROC-AUC | 리더보드 |
+|----------|-----------------------|:-----------:|:---------:|
+| Rank Equal | 0.33 / 0.33 / 0.33 | 0.740426 | — |
+| **Rank Weighted** | **0.33 / 0.41 / 0.26** | **0.740448** | **0.74218 ✅** |
  
-> 따라서 Day4에서는 CatBoost Optuna tuning을 우선 진행하기로 결정하였다.
+> 📌 당시에는 xgb_optuna_v1 결과가 실험 흐름에서 완전히 반영되지 않아  
+> XGB v2 기준으로 Rank Ensemble을 구성하고 제출하였다.
+ 
+<br>
+ 
+##### (2) 최신 재실험 버전 — XGB Optuna 기준 ⭐
+ 
+```text
+구성: XGBoost Optuna v1 + CatBoost v2 + LightGBM v1
+방법: Percentile Rank 변환 후 Weighted Average
+Baseline: 0.740444
+```
+ 
+| 항목 | 값 |
+|------|-----|
+| Best Single AUC | 0.740160 |
+| Prob Equal AUC | 0.740466 |
+| Rank Equal AUC | 0.740470 |
+| Prob Weighted Baseline | 0.740444 |
+| **Best Weighted Rank AUC** | **0.740487** |
+ 
+**최적 가중치**
+ 
+| XGB | CAT | LGB |
+|:---:|:---:|:---:|
+| 0.39 | 0.40 | 0.21 |
+ 
+**개선 폭**
+ 
+| 비교 기준 | Gain |
+|----------|:----:|
+| vs Prob Baseline | +0.000043 |
+| vs Rank Equal | +0.000017 |
+| vs Prob Equal | +0.000021 |
+| vs Best Single | +0.000327 |
+ 
+> 📌 Best Weighted Rank AUC = **0.740487** 은 테스트셋 점수가 아니라 OOF ROC-AUC 기준 내부 검증 성능이다.
+ 
+> ✅ Probability Weighted Baseline 초과  
+> ✅ **현재 전체 내부 검증 기준 최고 성능**
+ 
+<br>
  
 ---
  
-### Day4 — Planned Experiments
+#### 🏆 Ensemble 전체 비교 요약
  
-#### 11.1 CatBoost Optuna Tuning
+| 순서 | 파일 | XGB 버전 | 방법 | OOF ROC-AUC | 비고 |
+|:---:|------|---------|------|:-----------:|------|
+| 1 | ensemble_v1 | xgb v2 | XGB+CAT 2-Model | 0.740381 | 첫 Ensemble |
+| 2 | ensemble_v2 (1차) | xgb v2 | 3-Model Weighted | 0.740444 | — |
+| 3 | ensemble_v2 (2차) | xgb optuna | 3-Model Weighted | 0.740482 | Prob Ensemble 최고 |
+| 4 | ensemble_v3 (2차 기준) | xgb optuna | Stacking (Logistic) | 0.740128 | ❌ Baseline 미달 |
+| 5 | ensemble_v4 (제출) | xgb v2 | Rank Weighted | 0.740448 | ✅ 리더보드 제출 |
+| 6 | **ensemble_v4 (재실험)** | **xgb optuna** | **Rank Weighted** | **0.740487** | **⭐ 전체 최고** |
  
-**목적**
+<br>
  
-- CatBoost 단일 성능 자체를 끌어올리기
-- ensemble diversity를 유지하면서 전체 baseline 향상
+#### 🔍 핵심 관찰
  
-**예상 효과**
+| 관찰 | 수치 | 의미 |
+|------|:----:|------|
+| CatBoost 단일 성능 | 0.74005 < XGB 0.74016 | 단일로는 XGB가 더 강함 |
+| CatBoost Ensemble 가중치 | **0.40~0.41** | **Error Pattern Diversity 최대 기여** |
+| 예측 상관계수 (전체) | 0.99 이상 | Diversity 한계 → CatBoost 튜닝 필요 |
+| Stacking vs Weighted Ensemble | 0.740128 vs 0.740482 | 단순 결합이 더 효과적 |
+| OOF 최고 (Probability) | 0.740482 | XGB Optuna 기준 |
+| OOF 최고 (Rank) | **0.740487** | 현재 전체 최고 |
+| OOF vs 리더보드 (제출) | 0.740448 vs **0.74218** | **+0.00173 일반화 이득** |
  
-- CatBoost single model 성능 개선
-- ensemble weight 재구성 가능성
-- 최종 앙상블 ceiling 상승
- 
-#### 11.2 Ensemble Rebuild
- 
-튜닝된 CatBoost를 기반으로 Probability Ensemble / Rank Ensemble 재탐색
- 
-#### 11.3 Hybrid Ensemble
- 
-```
-final_pred = a × probability_ensemble + (1 - a) × rank_ensemble
-```
- 
-| 구성 요소 | 반영 정보 |
-|-----------|-----------|
-| Probability Ensemble | 절대적 확률 크기, calibration 정보, 모델 confidence |
-| Rank Ensemble | 상대적 순위, ordering 정보, calibration 차이 완화 |
- 
-> Hybrid Ensemble은 확률 기반 정보와 순위 기반 정보를 동시에 활용하는 방식이다.
- 
-`a` 탐색 범위: `0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8`
- 
-#### 11.4 Fine Search Around Best Weights
- 
-```
-XGB : 0.30 ~ 0.36
-CAT : 0.38 ~ 0.44
-step = 0.005
-```
+<br>
  
 ---
  
-## 📈 Current Performance
+## 🔑 핵심 인사이트
  
-| Version | ROC-AUC |
-|---------|---------|
-| v1 Baseline | 0.73997 |
-| v2 Tuned | 0.74011 |
-| Best Probability Ensemble | 0.740444 |
-| **Best Rank Ensemble** | **0.740448** |
-| **Public LB** | **0.74218** |
+| # | 인사이트 | 근거 | 결론 |
+|:---:|---------|------|------|
+| 1️⃣ | **Feature Engineering Saturation** | v3~v5 모두 v2/Optuna 미달 | Feature 추가 효과 소진 |
+| 2️⃣ | **Optuna 소폭 유효** | 0.74011 → 0.74016 (+0.00005) | Single Model 천장 소폭 상승 |
+| 3️⃣ | **Ensemble > Single Model** | 0.74016 → 0.740487 (+0.000327) | Ensemble 전환 정당성 |
+| 4️⃣ | **Rank > Stacking** | Stacking 0.740128 vs Rank 0.740487 | 단순 결합이 더 안정적 |
+| 5️⃣ | **CatBoost = Diversity Provider** | 단일 성능 < XGB, 가중치는 최대 | CatBoost 튜닝 우선 근거 |
+| 6️⃣ | **실험 로그 관리 중요** | Optuna 기록 누락으로 XGB 버전 혼재 | 버전 통일 필요 |
+| 7️⃣ | **OOF < 리더보드** | +0.00173 상승 | 안정적 일반화 확인 |
  
-- Fold variance 매우 낮음 → 안정적인 validation 성능 확인
-- OOF 대비 Public LB +0.00173 상승 → 안정적인 일반화 확인
+<br>
  
 ---
  
-## 📊 Model Visualization
+## 🗺️ 전체 실험 흐름
+ 
+```text
+Day 1  ────  🔵 XGBoost 기본 모델 (v1)
+                      │  ROC-AUC: 0.73997
+                      ▼
+Day 2  ────  🔧 Regularization 튜닝
+                      │  v2 reg_relax → 0.74011
+                      ▼
+Day 3  ────  🟠 CatBoost v2 학습 (0.74005)
+                      │
+                      ▼
+             📦 Ensemble v1  XGB v2 + CAT
+                      │  0.740381
+                      ▼
+             🟢 LightGBM v1 학습 (0.73987)
+                      │
+                      ▼
+             📦 Ensemble v2 (1차)  3-Model XGB v2
+                      │  0.740444
+                      ▼
+             📉 Feature Engineering (v3, v4)
+                      │  모두 하락
+                      ▼
+             🔵 XGBoost Optuna v1
+                      │  0.74016 (+0.00005)
+                      ▼
+             📦 Ensemble v2 (2차)  3-Model XGB Optuna
+                      │  0.740482
+                      ▼
+             📉 XGBoost v5 Branch Feature (0.740036)
+                      │
+                      ▼
+             📦 Ensemble Baseline Search
+                      │  0.740444 (XGB v2 기준)
+                      │  ⚠️ Optuna 로그 누락으로 v2 착각
+                      ▼
+             📦 Ensemble v3 Stacking ❌ 미달 (0.740050)
+                      │
+                      ▼
+             📦 Ensemble v4 Rank Ensemble (XGB v2)
+                      │  0.740448
+                      ▼
+             📤 리더보드 제출 → 0.74218 ✅
+                      │
+                      ▼
+             📦 Ensemble v3 Stacking 재실험 (XGB Optuna)
+                      │  0.740128 ❌ 여전히 미달
+                      ▼
+             📦 Ensemble v4 Rank Ensemble 재실험 (XGB Optuna)
+                      │  0.740487 ⭐ 전체 최고
+                      ▼
+Day 4  ────  🟠 CatBoost Optuna + XGB 버전 통일  ← 진행 예정
+                      │
+Day 5  ────  🔄 Ensemble 재구성
+                      │
+Day 6  ────  🔀 Hybrid Ensemble
+             (a × Probability Ensemble + (1-a) × Rank Ensemble)
+                      │
+Day 7  ────  🟢 LightGBM Optuna (선택)
+```
+ 
+<br>
+ 
+---
+ 
+## 🚀 Day 4 계획
+ 
+> **핵심 전략 1**: CatBoost Optuna로 Ensemble 천장 자체를 올리기  
+> **핵심 전략 2**: XGB Optuna 기준으로 Ensemble 버전 통일 후 공정 비교
+ 
+| 우선순위 | 작업 | 목적 | 예상 효과 |
+|:---:|------|------|:--------:|
+| 1️⃣ | 🟠 **CatBoost Optuna 튜닝** | 단일 성능 향상 + Diversity 유지 | +0.001~0.003 |
+| 2️⃣ | 🔄 **Ensemble 재구성** | XGB Optuna 기준으로 전체 재구성 | 천장 상승 |
+| 3️⃣ | 🔀 **Hybrid Ensemble** | Probability + Rank 정보 동시 활용 | +0.0003~0.0008 |
+| 4️⃣ | 🔍 **Weight Fine Search** | Best Weight 주변 미세 탐색 | +0.0001 |
+ 
+<br>
+ 
+### Day4 기준점
+ 
+```text
+XGB 버전  : xgb_optuna_v1
+기준값    : Ensemble v4 Rank Ensemble = 0.740487
+목표      : 0.743 이상
+```
+ 
+**Hybrid Ensemble 정의**
+ 
+```
+최종 예측 = a × Probability Ensemble + (1 - a) × Rank Ensemble
+탐색 범위: a = 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8
+```
+ 
+**Weight Fine Search 범위**
+ 
+```
+XGB : 0.30 ~ 0.36  (step = 0.005)
+CAT : 0.38 ~ 0.44  (step = 0.005)
+LGB : 자동 계산 (1 - XGB - CAT)
+```
+ 
+**Day4 CatBoost Optuna 추천 세팅**
+ 
+```python
+N_TRIALS = 50
+TIMEOUT  = 3600
+N_SPLITS = 5
+SEED     = 42
+ 
+search_space = {
+    "iterations"                : [3000, 4000, 5000, 6000],
+    "learning_rate"             : (0.01, 0.05),
+    "depth"                     : (4, 8),
+    "l2_leaf_reg"               : (1.0, 10.0),
+    "random_strength"           : (0.0, 5.0),
+    "bagging_temperature"       : (0.0, 3.0),
+    "border_count"              : (64, 255),
+    "leaf_estimation_iterations": (1, 10),
+}
+```
+ 
+**탐색 방향 추천**
+ 
+| 파라미터 | 우선 탐색 구간 | 이유 |
+|---------|:------------:|------|
+| learning_rate | 0.02 ~ 0.04 | 현재 0.03 기준 근방 |
+| depth | 5 ~ 7 | Overfitting 방지 + 표현력 균형 |
+| l2_leaf_reg | 3 ~ 8 | 적절한 Regularization 구간 |
+| bagging_temperature | 0.3 ~ 1.5 | Diversity 확보 |
+ 
+<br>
+ 
+---
+ 
+## 📊 모델 시각화
  
 ### ROC Curve
  
-| Baseline (v1) | Tuned (v2) |
+| 기본 모델 (v1) | 튜닝 모델 (v2) |
 |:---:|:---:|
-| <img src="outputs/xgb_v1_roc_curve.png" width="400"> | <img src="outputs/xgb_v2_baseline_roc_curve.png" width="400"> |
+| <img src="outputs/xgb_v1_roc_curve.png" width="380"> | <img src="outputs/xgb_v2_reg_relax_roc_curve.png" width="380"> |
+ 
+<br>
  
 ### PR Curve
  
@@ -520,87 +781,86 @@ step = 0.005
   <img src="outputs/xgb_v1_pr_curve.png" width="500">
 </p>
  
-### Feature Importance
+<br>
+ 
+### Feature Importance (Top 30)
  
 <p align="center">
   <img src="outputs/xgb_v1_feature_importance.png" width="700">
 </p>
  
----
- 
-## 🔑 Key Insights
- 
-| # | Insight |
-|---|---------|
-| 1 | **Feature Engineering Saturation**: feature 추가 시 성능 향상이 제한적. single model ≈ 0.740 |
-| 2 | **Ensemble Effect**: 앙상블 적용 시 안정적인 성능 향상. 0.74011 → 0.74044 |
-| 3 | **Rank Ensemble Advantage**: Tree 기반 모델 조합에서 rank ensemble이 probability ensemble보다 소폭 우수 |
-| 4 | **CatBoost Diversity**: 단일 성능 < XGB이지만 앙상블 weight는 가장 높음. error pattern diversity 기여 |
+<br>
  
 ---
  
-## 🚀 Future Work
- 
-### Day4 Priority
- 
-1. CatBoost Optuna Tuning
-2. Ensemble Rebuild
-3. Hybrid Ensemble (`a × prob + (1-a) × rank`)
-4. Fine Weight Search
- 
-### Longer-Term Plan
- 
-```
-Day5: Ensemble rebuild with tuned CatBoost
-Day6: Hybrid Ensemble + Fine Search
-Day7: LightGBM Optuna (optional)
-```
- 
-### 🎯 Goal
- 
-```
-ROC-AUC 0.740 → 0.743+
-```
- 
-- 더 높은 일반화 성능 확보
-- 안정적인 ensemble 기반 최종 모델 구축
- 
----
- 
-## 📂 Repository Structure
+## 📂 저장소 구조
  
 ```
 yysop/
-├── data/
-├── outputs/
+│
+├── 📁 data/
+│   ├── train.csv
+│   ├── test.csv
+│   └── sample_submission.csv
+│
+├── 📁 outputs/
 │   ├── xgb_v1_roc_curve.png
 │   ├── xgb_v1_pr_curve.png
 │   ├── xgb_v1_feature_importance.png
 │   └── xgb_v2_reg_relax_roc_curve.png
 │
-├── src/
-│   ├── eda.py
-│   ├── xgb_kfold_v1.py
-│   ├── xgb_kfold_v2.py
+├── 📁 src/
 │   │
-│   ├── catboost_kfold_v2.py
-│   ├── lightgbm_kfold_v1.py
+│   ├── 🔵 XGBoost
+│   │   ├── xgb_kfold_v1.py            # 기본 모델
+│   │   ├── xgb_kfold_v2.py            # reg_relax
+│   │   ├── xgb_kfold_v3.py            # Feature 확장 (실험용)
+│   │   ├── xgb_kfold_v4.py            # Feature 축소 (실험용)
+│   │   ├── xgb_kfold_v5_branch.py     # Branch Feature (실험용)
+│   │   └── xgb_optuna_v1.py           # Optuna 튜닝 ⭐
 │   │
-│   ├── ensemble_v2.py
-│   └── ensemble_v4_rank_ensemble.py
+│   ├── 🟠 CatBoost
+│   │   └── catboost_kfold_v2.py       # 기본 모델 v2
+│   │
+│   ├── 🟢 LightGBM
+│   │   └── lightgbm_kfold_v1.py       # 기본 모델 v1
+│   │
+│   └── 📊 Ensemble
+│       ├── ensemble_v1.py                 # XGB+CAT 2-Model
+│       ├── ensemble_v2.py                 # 3-Model Probability Ensemble ⭐ OOF 최고
+│       ├── ensemble_baseline_search.py    # Weight Grid Search
+│       ├── ensemble_v3_stacking.py        # Stacking (Logistic Meta Model)
+│       └── ensemble_v4_rank_ensemble.py   # Rank Ensemble ✅ 리더보드 제출 / ⭐ 재실험 최고
 │
-└── README.md
+└── 📄 README.md
 ```
+ 
+<br>
  
 ---
  
-## 🧑‍⚕️ Expected Impact
+## 🧑‍⚕️ 기대 효과
  
-본 프로젝트는 난임 치료 데이터 분석을 통해 다음 분야에 기여할 수 있습니다.
+> 본 프로젝트는 난임 치료 데이터 분석을 통해 다음 분야에 기여할 수 있습니다.
  
-- **임신 성공 확률 예측** — 시술 전 성공 가능성 추정
-- **환자 맞춤형 치료 전략 지원** — 데이터 기반 개인화 치료 계획
-- **의료진의 데이터 기반 의사결정 보조** — 임상 판단 지원 시스템
+| 분야 | 기여 내용 |
+|:---:|---|
+| 🔮 **임신 성공 확률 예측** | 시술 전 성공 가능성 추정으로 치료 계획 수립 지원 |
+| 👤 **환자 맞춤형 치료** | 나이·이력·시술 방식 기반 개인화 전략 제안 |
+| 🏥 **의료진 의사결정 지원** | 데이터 기반 임상 판단 보조 AI 시스템 |
+| 📉 **비용·부담 절감** | 불필요한 반복 시술 최소화로 환자 부담 경감 |
  
-> AI 기반 예측 모델이 난임 치료의 성공률을 높이고  
-> 환자의 신체적·정신적·경제적 부담을 줄이는 데 기여하는 것을 목표로 합니다.
+<br>
+ 
+> 🎯 **AI 기반 예측 모델이 난임 치료의 성공률을 높이고**  
+> **환자의 신체적·정신적·경제적 부담을 줄이는 데 기여하는 것을 목표로 합니다.**
+ 
+<br>
+ 
+---
+ 
+<div align="center">
+ 
+❤️ for better infertility treatment outcomes
+ 
+</div>

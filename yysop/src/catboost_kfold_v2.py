@@ -15,9 +15,6 @@
 # - COUNT/AGE 원본 문자열 컬럼은 제거
 # - 일반 범주형 문자열은 CatBoost에 그대로 전달
 # - 이후 XGB OOF와 앙상블하기 쉽게 출력 형식 통일
-#
-# 실행 방법
-#   python yysop/src/catboost_kfold_v2.py
 # =========================================================
 
 import os
