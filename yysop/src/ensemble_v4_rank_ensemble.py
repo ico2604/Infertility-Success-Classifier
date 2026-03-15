@@ -8,9 +8,6 @@
 # 4) 기존 weighted probability baseline(0.740444)과 비교한다.
 # 5) best rank ensemble OOF / submission / results log를 저장한다.
 # 6) 제출 파일은 sample_submission.csv 형식(ID, probability)에 맞춰 저장한다.
-#
-# 실행 예시
-#   python yysop/src/ensemble_v4_rank_ensemble.py
 # =========================================================
 
 import os
