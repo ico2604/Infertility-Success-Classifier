@@ -42,3 +42,10 @@ logs/
 *.log
 
 yysop/outputs/eda/*.csv
+yysop/outputs/*.csv
+
+# 결과를 시각화로 보여주기 위해 해당 파일은 ignore 해제
+!yysop/outputs/xgb_v1_feature_importance.png
+!yysop/outputs/xgb_v2_reg_relax_roc_curve.png
+!yysop/outputs/xgb_v1_roc_curve.png
+!yysop/outputs/xgb_v1_pr_curve.png
