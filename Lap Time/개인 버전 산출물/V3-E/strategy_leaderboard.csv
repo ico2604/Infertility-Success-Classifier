@@ -1,0 +1,14 @@
+﻿strategy_name,labels,mode,overall_auc,weights
+cross_team_doc4_soft_vote_fine,"['codex_v3_1', 'claude_v3_lgb', 'claude_v3_xgb', 'claude_v3_cat']",soft_vote,0.740824,"{'codex_v3_1': 0.55, 'claude_v3_lgb': 0.15, 'claude_v3_xgb': 0.3, 'claude_v3_cat': 0.0}"
+cross_team_doc4_soft_vote,"['codex_v3_1', 'claude_v3_lgb', 'claude_v3_xgb', 'claude_v3_cat']",soft_vote,0.740822,"{'codex_v3_1': 0.5, 'claude_v3_lgb': 0.2, 'claude_v3_xgb': 0.3, 'claude_v3_cat': 0.0}"
+top4_by_single_auc_soft_vote,"['codex_v3_1', 'claude_v3_ensemble', 'claude_v3_xgb', 'claude_v3_lgb']",soft_vote,0.740822,"{'codex_v3_1': 0.5, 'claude_v3_ensemble': 0.0, 'claude_v3_xgb': 0.3, 'claude_v3_lgb': 0.2}"
+top6_by_single_auc_rank_average,"['codex_v3_1', 'claude_v3_ensemble', 'claude_v3_xgb', 'claude_v3_lgb', 'claude_v3_cat', 'codex_lgb_seedavg']",rank_average,0.740809,{}
+our_core_soft_vote,"['codex_v3_1', 'codex_lgb_seedavg']",soft_vote,0.740777,"{'codex_v3_1': 0.6, 'codex_lgb_seedavg': 0.4}"
+top4_by_single_auc_rank_average,"['codex_v3_1', 'claude_v3_ensemble', 'claude_v3_xgb', 'claude_v3_lgb']",rank_average,0.740753,{}
+cross_team_doc4_rank_average,"['codex_v3_1', 'claude_v3_lgb', 'claude_v3_xgb', 'claude_v3_cat']",rank_average,0.740753,{}
+our_core_rank_average,"['codex_v3_1', 'codex_lgb_seedavg']",rank_average,0.74075,{}
+cross_team_doc7_rank_average,"['codex_v3_1', 'claude_v3_lgb', 'claude_v3_xgb', 'claude_v3_cat', 'claude_v3_ensemble']",rank_average,0.740727,{}
+cross_team_doc5_rank_average,"['codex_v3_1', 'claude_v3_lgb', 'claude_v3_xgb', 'claude_v3_cat', 'claude_v3_ensemble']",rank_average,0.740727,{}
+cross_team_doc6_rank_average,"['codex_v3_1', 'claude_v3_lgb', 'claude_v3_xgb', 'claude_v3_cat', 'claude_v3_ensemble']",rank_average,0.740727,{}
+external_core_rank_average,"['claude_v3_lgb', 'claude_v3_xgb', 'claude_v3_cat', 'claude_v3_ensemble']",rank_average,0.740589,{}
+external_core_soft_vote,"['claude_v3_lgb', 'claude_v3_xgb', 'claude_v3_cat', 'claude_v3_ensemble']",soft_vote,0.740586,"{'claude_v3_lgb': 0.2, 'claude_v3_xgb': 0.4, 'claude_v3_cat': 0.3, 'claude_v3_ensemble': 0.1}"

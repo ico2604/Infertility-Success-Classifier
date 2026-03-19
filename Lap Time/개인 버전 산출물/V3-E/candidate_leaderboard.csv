@@ -1,0 +1,7 @@
+﻿label,model_name,exp_id,source_type,overall_auc,notes
+codex_v3_1,catboost,20260314_021753_catboost_fe_v3_1_ivf_di_split,internal_csv,0.740605,catboost_fe_v3_1_ivf_di_split
+claude_v3_ensemble,ensemble,claude_v3_ensemble,external_npy,0.74058,external Step09 candidate
+claude_v3_xgb,xgboost,claude_v3_xgb,external_npy,0.740475,external Step09 candidate
+claude_v3_lgb,lightgbm,claude_v3_lgb,external_npy,0.740382,external Step09 candidate
+claude_v3_cat,catboost,claude_v3_cat,external_npy,0.740337,external Step09 candidate
+codex_lgb_seedavg,lightgbm,20260313_183906_lgbm_fe_v1_seedavg,internal_csv,0.740237,best internal LightGBM

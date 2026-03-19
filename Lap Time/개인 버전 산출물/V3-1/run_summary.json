@@ -1,0 +1,287 @@
+{
+  "exp_id": "20260314_021753_catboost_fe_v3_1_ivf_di_split",
+  "model_name": "catboost",
+  "overall_auc": 0.740605,
+  "seed_auc_mean": 0.740345,
+  "seed_auc_std": 3.6e-05,
+  "feature_count": 122,
+  "categorical_count": 30,
+  "top_features": [
+    {
+      "feature": "이식된 배아 수",
+      "importance_gain": 47.012201482692035,
+      "importance_split": 47.012201482692035
+    },
+    {
+      "feature": "embryo_transfer_days_x_age",
+      "importance_gain": 5.057724353402899,
+      "importance_split": 5.057724353402899
+    },
+    {
+      "feature": "배아 이식 경과일_missing_flag",
+      "importance_gain": 4.164121790317282,
+      "importance_split": 4.164121790317282
+    },
+    {
+      "feature": "age_bucket_ord",
+      "importance_gain": 3.2164630967490617,
+      "importance_split": 3.2164630967490617
+    },
+    {
+      "feature": "배아 이식 경과일",
+      "importance_gain": 3.0443801824805887,
+      "importance_split": 3.0443801824805887
+    },
+    {
+      "feature": "ivf_transfer_ratio_signal_v3",
+      "importance_gain": 3.0316514931206786,
+      "importance_split": 3.0316514931206786
+    },
+    {
+      "feature": "stored_over_created_ratio",
+      "importance_gain": 2.3924279863149276,
+      "importance_split": 2.3924279863149276
+    },
+    {
+      "feature": "시술 당시 나이",
+      "importance_gain": 2.2247658745516925,
+      "importance_split": 2.2247658745516925
+    },
+    {
+      "feature": "난자 채취 경과일",
+      "importance_gain": 2.102984991461217,
+      "importance_split": 2.102984991461217
+    },
+    {
+      "feature": "created_minus_transferred",
+      "importance_gain": 2.024481059011956,
+      "importance_split": 2.024481059011956
+    },
+    {
+      "feature": "난자 채취 경과일_missing_flag",
+      "importance_gain": 1.9587048399794182,
+      "importance_split": 1.9587048399794182
+    },
+    {
+      "feature": "treatment_source_combo_v3",
+      "importance_gain": 1.8659863289742114,
+      "importance_split": 1.8659863289742114
+    },
+    {
+      "feature": "저장된 배아 수",
+      "importance_gain": 1.7116355896109314,
+      "importance_split": 1.7116355896109314
+    },
+    {
+      "feature": "수집된 신선 난자 수",
+      "importance_gain": 1.6144734548523536,
+      "importance_split": 1.6144734548523536
+    },
+    {
+      "feature": "난자 출처",
+      "importance_gain": 1.5124531829780217,
+      "importance_split": 1.5124531829780217
+    },
+    {
+      "feature": "fresh_minus_mixed",
+      "importance_gain": 1.4836777252073534,
+      "importance_split": 1.4836777252073534
+    },
+    {
+      "feature": "총 생성 배아 수",
+      "importance_gain": 1.291862583490883,
+      "importance_split": 1.291862583490883
+    },
+    {
+      "feature": "age_treatment_combo",
+      "importance_gain": 1.2082411685652807,
+      "importance_split": 1.2082411685652807
+    },
+    {
+      "feature": "ivf_storage_ratio_signal_v3",
+      "importance_gain": 1.2046350206656415,
+      "importance_split": 1.2046350206656415
+    },
+    {
+      "feature": "transfer_over_created_ratio",
+      "importance_gain": 1.1272544037134196,
+      "importance_split": 1.1272544037134196
+    }
+  ],
+  "seed_scores": [
+    {
+      "seed": 42,
+      "roc_auc": 0.740356
+    },
+    {
+      "seed": 2026,
+      "roc_auc": 0.740297
+    },
+    {
+      "seed": 2604,
+      "roc_auc": 0.740382
+    }
+  ],
+  "fold_scores": [
+    {
+      "seed": 42,
+      "fold": 1,
+      "roc_auc": 0.738367,
+      "best_iteration": 1420
+    },
+    {
+      "seed": 42,
+      "fold": 2,
+      "roc_auc": 0.743218,
+      "best_iteration": 1586
+    },
+    {
+      "seed": 42,
+      "fold": 3,
+      "roc_auc": 0.740281,
+      "best_iteration": 1446
+    },
+    {
+      "seed": 42,
+      "fold": 4,
+      "roc_auc": 0.738783,
+      "best_iteration": 1586
+    },
+    {
+      "seed": 42,
+      "fold": 5,
+      "roc_auc": 0.741191,
+      "best_iteration": 1638
+    },
+    {
+      "seed": 2026,
+      "fold": 1,
+      "roc_auc": 0.73689,
+      "best_iteration": 2437
+    },
+    {
+      "seed": 2026,
+      "fold": 2,
+      "roc_auc": 0.740212,
+      "best_iteration": 1564
+    },
+    {
+      "seed": 2026,
+      "fold": 3,
+      "roc_auc": 0.737852,
+      "best_iteration": 1625
+    },
+    {
+      "seed": 2026,
+      "fold": 4,
+      "roc_auc": 0.747166,
+      "best_iteration": 1866
+    },
+    {
+      "seed": 2026,
+      "fold": 5,
+      "roc_auc": 0.739405,
+      "best_iteration": 2314
+    },
+    {
+      "seed": 2604,
+      "fold": 1,
+      "roc_auc": 0.740092,
+      "best_iteration": 1679
+    },
+    {
+      "seed": 2604,
+      "fold": 2,
+      "roc_auc": 0.738341,
+      "best_iteration": 1806
+    },
+    {
+      "seed": 2604,
+      "fold": 3,
+      "roc_auc": 0.741951,
+      "best_iteration": 1087
+    },
+    {
+      "seed": 2604,
+      "fold": 4,
+      "roc_auc": 0.738906,
+      "best_iteration": 2067
+    },
+    {
+      "seed": 2604,
+      "fold": 5,
+      "roc_auc": 0.742736,
+      "best_iteration": 2559
+    }
+  ],
+  "params": {
+    "folds": 5,
+    "seeds": [
+      42,
+      2026,
+      2604
+    ],
+    "iterations": 6000,
+    "learning_rate": 0.02,
+    "depth": 6,
+    "l2_leaf_reg": 10.0,
+    "random_strength": 1.2,
+    "bagging_temperature": 0.8,
+    "rsm": 0.8,
+    "border_count": 128,
+    "early_stopping_rounds": 300,
+    "task_type": "GPU",
+    "devices": "0"
+  },
+  "feature_flags": {
+    "enable_ivf_di_split": true,
+    "enable_infertility_bundle": false,
+    "enable_rare_cleanup": false,
+    "enable_pruning": false,
+    "enable_time_delta_signals": false,
+    "rare_threshold": 100,
+    "prune_bottom_k": 10,
+    "baseline_importance_path": "kwanju/outputs/catboost/20260313_212336_catboost_fe_v2_seedavg/feature_importance.csv"
+  },
+  "feature_report": {
+    "feature_version": "catboost_enable_ivf_di_split",
+    "base_feature_version": "lgbm_fe_v1",
+    "enabled_flags": [
+      "enable_ivf_di_split"
+    ],
+    "added_numeric": [
+      "is_ivf_flag_v3",
+      "is_di_flag_v3",
+      "ivf_total_treatment_load_v3",
+      "di_total_treatment_load_v3",
+      "ivf_pregnancy_load_v3",
+      "di_pregnancy_load_v3",
+      "ivf_transfer_ratio_signal_v3",
+      "di_transfer_ratio_signal_v3",
+      "ivf_storage_ratio_signal_v3",
+      "di_storage_ratio_signal_v3",
+      "ivf_embryo_age_signal_v3",
+      "di_embryo_age_signal_v3"
+    ],
+    "added_categorical": [
+      "treatment_history_combo_v3",
+      "treatment_source_combo_v3",
+      "treatment_age_history_combo_v3"
+    ],
+    "dropped_features": [],
+    "rare_bucketed_columns": [],
+    "missing_flags": [
+      "난자 해동 경과일_missing_flag",
+      "PGS 시술 여부_missing_flag",
+      "PGD 시술 여부_missing_flag",
+      "착상 전 유전 검사 사용 여부_missing_flag",
+      "임신 시도 또는 마지막 임신 경과 연수_missing_flag",
+      "배아 해동 경과일_missing_flag",
+      "난자 채취 경과일_missing_flag",
+      "난자 혼합 경과일_missing_flag",
+      "배아 이식 경과일_missing_flag"
+    ]
+  },
+  "notes": "V3-1 IVF/DI 분기 피처 강화",
+  "output_dir": "C:\\Users\\mal03\\Desktop\\레퍼런스\\코덱스 오즈코딩\\Infertility-Success-Classifier\\kwanju\\outputs\\catboost\\20260314_021753_catboost_fe_v3_1_ivf_di_split"
+}

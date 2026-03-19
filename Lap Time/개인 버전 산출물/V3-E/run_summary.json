@@ -1,0 +1,215 @@
+{
+  "exp_id": "20260315_102628_v5_best_ensemble",
+  "model_name": "ensemble",
+  "overall_auc": 0.740824,
+  "ensemble_mode": "soft_vote",
+  "candidate_labels": [
+    "codex_v3_1",
+    "claude_v3_lgb",
+    "claude_v3_xgb",
+    "claude_v3_cat"
+  ],
+  "weights": {
+    "codex_v3_1": 0.55,
+    "claude_v3_lgb": 0.15,
+    "claude_v3_xgb": 0.3,
+    "claude_v3_cat": 0.0
+  },
+  "strategy_name": "cross_team_doc4_soft_vote_fine",
+  "candidate_stats": [
+    {
+      "label": "codex_v3_1",
+      "model_name": "catboost",
+      "exp_id": "20260314_021753_catboost_fe_v3_1_ivf_di_split",
+      "source_type": "internal_csv",
+      "overall_auc": 0.740605,
+      "notes": "catboost_fe_v3_1_ivf_di_split"
+    },
+    {
+      "label": "claude_v3_ensemble",
+      "model_name": "ensemble",
+      "exp_id": "claude_v3_ensemble",
+      "source_type": "external_npy",
+      "overall_auc": 0.74058,
+      "notes": "external Step09 candidate"
+    },
+    {
+      "label": "claude_v3_xgb",
+      "model_name": "xgboost",
+      "exp_id": "claude_v3_xgb",
+      "source_type": "external_npy",
+      "overall_auc": 0.740475,
+      "notes": "external Step09 candidate"
+    },
+    {
+      "label": "claude_v3_lgb",
+      "model_name": "lightgbm",
+      "exp_id": "claude_v3_lgb",
+      "source_type": "external_npy",
+      "overall_auc": 0.740382,
+      "notes": "external Step09 candidate"
+    },
+    {
+      "label": "claude_v3_cat",
+      "model_name": "catboost",
+      "exp_id": "claude_v3_cat",
+      "source_type": "external_npy",
+      "overall_auc": 0.740337,
+      "notes": "external Step09 candidate"
+    },
+    {
+      "label": "codex_lgb_seedavg",
+      "model_name": "lightgbm",
+      "exp_id": "20260313_183906_lgbm_fe_v1_seedavg",
+      "source_type": "internal_csv",
+      "overall_auc": 0.740237,
+      "notes": "best internal LightGBM"
+    }
+  ],
+  "top_strategies": [
+    {
+      "strategy_name": "cross_team_doc4_soft_vote_fine",
+      "labels": [
+        "codex_v3_1",
+        "claude_v3_lgb",
+        "claude_v3_xgb",
+        "claude_v3_cat"
+      ],
+      "mode": "soft_vote",
+      "overall_auc": 0.740824,
+      "weights": {
+        "codex_v3_1": 0.55,
+        "claude_v3_lgb": 0.15,
+        "claude_v3_xgb": 0.3,
+        "claude_v3_cat": 0.0
+      }
+    },
+    {
+      "strategy_name": "cross_team_doc4_soft_vote",
+      "labels": [
+        "codex_v3_1",
+        "claude_v3_lgb",
+        "claude_v3_xgb",
+        "claude_v3_cat"
+      ],
+      "mode": "soft_vote",
+      "overall_auc": 0.740822,
+      "weights": {
+        "codex_v3_1": 0.5,
+        "claude_v3_lgb": 0.2,
+        "claude_v3_xgb": 0.3,
+        "claude_v3_cat": 0.0
+      }
+    },
+    {
+      "strategy_name": "top4_by_single_auc_soft_vote",
+      "labels": [
+        "codex_v3_1",
+        "claude_v3_ensemble",
+        "claude_v3_xgb",
+        "claude_v3_lgb"
+      ],
+      "mode": "soft_vote",
+      "overall_auc": 0.740822,
+      "weights": {
+        "codex_v3_1": 0.5,
+        "claude_v3_ensemble": 0.0,
+        "claude_v3_xgb": 0.3,
+        "claude_v3_lgb": 0.2
+      }
+    },
+    {
+      "strategy_name": "top6_by_single_auc_rank_average",
+      "labels": [
+        "codex_v3_1",
+        "claude_v3_ensemble",
+        "claude_v3_xgb",
+        "claude_v3_lgb",
+        "claude_v3_cat",
+        "codex_lgb_seedavg"
+      ],
+      "mode": "rank_average",
+      "overall_auc": 0.740809,
+      "weights": {}
+    },
+    {
+      "strategy_name": "our_core_soft_vote",
+      "labels": [
+        "codex_v3_1",
+        "codex_lgb_seedavg"
+      ],
+      "mode": "soft_vote",
+      "overall_auc": 0.740777,
+      "weights": {
+        "codex_v3_1": 0.6,
+        "codex_lgb_seedavg": 0.4
+      }
+    },
+    {
+      "strategy_name": "top4_by_single_auc_rank_average",
+      "labels": [
+        "codex_v3_1",
+        "claude_v3_ensemble",
+        "claude_v3_xgb",
+        "claude_v3_lgb"
+      ],
+      "mode": "rank_average",
+      "overall_auc": 0.740753,
+      "weights": {}
+    },
+    {
+      "strategy_name": "cross_team_doc4_rank_average",
+      "labels": [
+        "codex_v3_1",
+        "claude_v3_lgb",
+        "claude_v3_xgb",
+        "claude_v3_cat"
+      ],
+      "mode": "rank_average",
+      "overall_auc": 0.740753,
+      "weights": {}
+    },
+    {
+      "strategy_name": "our_core_rank_average",
+      "labels": [
+        "codex_v3_1",
+        "codex_lgb_seedavg"
+      ],
+      "mode": "rank_average",
+      "overall_auc": 0.74075,
+      "weights": {}
+    },
+    {
+      "strategy_name": "cross_team_doc7_rank_average",
+      "labels": [
+        "codex_v3_1",
+        "claude_v3_lgb",
+        "claude_v3_xgb",
+        "claude_v3_cat",
+        "claude_v3_ensemble"
+      ],
+      "mode": "rank_average",
+      "overall_auc": 0.740727,
+      "weights": {}
+    },
+    {
+      "strategy_name": "cross_team_doc5_rank_average",
+      "labels": [
+        "codex_v3_1",
+        "claude_v3_lgb",
+        "claude_v3_xgb",
+        "claude_v3_cat",
+        "claude_v3_ensemble"
+      ],
+      "mode": "rank_average",
+      "overall_auc": 0.740727,
+      "weights": {}
+    }
+  ],
+  "output_dir": "C:\\Users\\mal03\\Desktop\\레퍼런스\\코덱스 오즈코딩\\Infertility-Success-Classifier\\kwanju\\outputs\\ensemble\\20260315_102628_v5_best_ensemble",
+  "source_summary": {
+    "v3_summary_path": "C:\\Users\\mal03\\Desktop\\레퍼런스\\코덱스 오즈코딩\\Infertility-Success-Classifier\\kwanju\\outputs\\catboost\\v3_campaign_summary.json",
+    "v4_summary_path": "C:\\Users\\mal03\\Desktop\\레퍼런스\\코덱스 오즈코딩\\Infertility-Success-Classifier\\kwanju\\outputs\\catboost\\v4_campaign_summary.json",
+    "external_root": "C:\\Users\\mal03\\Desktop\\레퍼런스\\클로드 오즈코딩\\난임 환자 임신 성공률"
+  }
+}
