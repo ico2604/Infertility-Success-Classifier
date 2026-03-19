@@ -1,13 +1,18 @@
 # =========================================================
-# ensemble_v4_rank_ensemble.py
+# ensemble_v4_rank_ensemble_xgb_lgbivf_catv7.py
 # ---------------------------------------------------------
 # 목적
 # 1) XGB / CAT / LGB OOF 예측 파일을 불러온다.
 # 2) 각 모델 예측값을 rank로 변환한다.
 # 3) rank ensemble(equal / weighted)을 평가한다.
-# 4) 기존 weighted probability baseline(0.740444)과 비교한다.
+# 4) 현재 3모델 probability weighted baseline과 비교한다.
 # 5) best rank ensemble OOF / submission / results log를 저장한다.
 # 6) 제출 파일은 sample_submission.csv 형식(ID, probability)에 맞춰 저장한다.
+#
+# 모델 조합
+# - XGB : xgb_optuna_v1
+# - CAT : catboost_optuna_fixed_v7_ivf_combo
+# - LGB : lightgbm_ivf_signal_v2
 # =========================================================
 
 import os
@@ -28,20 +33,24 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 SAMPLE_SUB_PATH = os.path.join(DATA_DIR, "sample_submission.csv")
 
-# XGB (Optuna)
-# XGB_OOF_PATH = os.path.join(OUTPUT_DIR, "xgb_optuna_v1_oof_predictions.csv")
-# XGB_SUB_PATH = os.path.join(OUTPUT_DIR, "xgb_optuna_v1_submission.csv")
+# =========================================================
+# 사용할 모델 파일 경로
+# =========================================================
 
-XGB_OOF_PATH = os.path.join(OUTPUT_DIR, "xgb_v2_reg_relax_oof_predictions.csv")
-CAT_OOF_PATH = os.path.join(OUTPUT_DIR, "catboost_v2_catboost_baseline_v2_oof_predictions.csv")
-LGB_OOF_PATH = os.path.join(OUTPUT_DIR, "lightgbm_v1_lightgbm_baseline_v1_oof_predictions.csv")
+# XGB (Optuna v1)
+XGB_OOF_PATH = os.path.join(OUTPUT_DIR, "xgb_optuna_v1_oof_predictions.csv")
+XGB_SUB_PATH = os.path.join(OUTPUT_DIR, "xgb_optuna_v1_submission.csv")
 
-XGB_SUB_PATH = os.path.join(OUTPUT_DIR, "xgb_v2_reg_relax_submission.csv")
-CAT_SUB_PATH = os.path.join(OUTPUT_DIR, "catboost_v2_catboost_baseline_v2_submission.csv")
-LGB_SUB_PATH = os.path.join(OUTPUT_DIR, "lightgbm_v1_lightgbm_baseline_v1_submission.csv")
+# CAT (Optuna fixed v7 ivf combo)
+CAT_OOF_PATH = os.path.join(OUTPUT_DIR, "catboost_optuna_fixed_v7_ivf_combo_oof_predictions.csv")
+CAT_SUB_PATH = os.path.join(OUTPUT_DIR, "catboost_optuna_fixed_v7_ivf_combo_submission.csv")
 
-RESULT_LOG_PATH = os.path.join(OUTPUT_DIR, "ensemble_v4_rank_results_log.csv")
-SEARCH_RESULT_PATH = os.path.join(OUTPUT_DIR, "ensemble_v4_rank_search_results.csv")
+# LGB (IVF signal v2)
+LGB_OOF_PATH = os.path.join(OUTPUT_DIR, "lightgbm_ivf_signal_v2_oof_predictions.csv")
+LGB_SUB_PATH = os.path.join(OUTPUT_DIR, "lightgbm_ivf_signal_v2_submission.csv")
+
+RESULT_LOG_PATH = os.path.join(OUTPUT_DIR, "ensemble_v4_rank_xgb_lgbivf_catv7_results_log.csv")
+SEARCH_RESULT_PATH = os.path.join(OUTPUT_DIR, "ensemble_v4_rank_xgb_lgbivf_catv7_search_results.csv")
 
 TARGET_COL = "임신 성공 여부"   # 학습/OOF용
 ID_COL = "ID"
@@ -51,16 +60,24 @@ OOF_PRED_COL = "oof_pred_prob"
 SUBMIT_ID_COL = "ID"
 SUBMIT_TARGET_COL = "probability"
 
-# 현재 확정 probability weighted baseline
-BASELINE_AUC = 0.740444
-BASELINE_NAME = "prob_weighted_ensemble"
-BASELINE_WEIGHTS = "xgb=0.33, cat=0.40, lgb=0.27"
+# =========================================================
+# baseline 비교용 설정
+# ---------------------------------------------------------
+# False면 현재 조합(XGB+CATv7+LGB_ivf)의 probability weighted baseline을
+# 간단 탐색해서 비교함
+# True면 FIXED_BASELINE_AUC와 비교
+# =========================================================
+USE_FIXED_BASELINE = False
+
+FIXED_BASELINE_AUC = 0.740634
+FIXED_BASELINE_NAME = "rank_xgb_lgbivf_catv6_prev"
+FIXED_BASELINE_WEIGHTS = "xgb=0.32, cat=0.52, lgb=0.16"
 
 # rank ensemble 가중치 탐색 step
 SEARCH_STEP = 0.01
 ROUND_DIGITS = 4
 
-EXPERIMENT_NAME = "ensemble_v4_rank_ensemble"
+EXPERIMENT_NAME = "ensemble_v4_rank_xgb_lgbivf_catv7"
 
 
 # =========================================================
@@ -95,8 +112,6 @@ def load_oof_file(path, model_name, keep_target=False):
 def load_submission_file(path, model_name):
     df = pd.read_csv(path)
 
-    required_cols = [ID_COL]
-    # 두 번째 컬럼명을 알 수 없으므로 ID + 나머지 1개만 사용
     if ID_COL not in df.columns:
         raise ValueError(f"[{model_name}] submission 파일에 ID 컬럼이 없습니다.")
 
@@ -208,9 +223,53 @@ cat_auc = roc_auc_score(y, oof_df["cat_pred"].values)
 lgb_auc = roc_auc_score(y, oof_df["lgb_pred"].values)
 
 prob_equal_pred = (
-    oof_df["xgb_pred"].values + oof_df["cat_pred"].values + oof_df["lgb_pred"].values
+    oof_df["xgb_pred"].values
+    + oof_df["cat_pred"].values
+    + oof_df["lgb_pred"].values
 ) / 3.0
 prob_equal_auc = roc_auc_score(y, prob_equal_pred)
+
+if USE_FIXED_BASELINE:
+    BASELINE_AUC = FIXED_BASELINE_AUC
+    BASELINE_NAME = FIXED_BASELINE_NAME
+    BASELINE_WEIGHTS = FIXED_BASELINE_WEIGHTS
+else:
+    # 현재 조합 기준 probability weighted baseline 간단 탐색
+    prob_baseline_candidates = [
+        (0.32, 0.52, 0.16),
+        (0.33, 0.52, 0.15),
+        (0.31, 0.53, 0.16),
+        (0.32, 0.53, 0.15),
+        (0.33, 0.51, 0.16),
+        (0.31, 0.52, 0.17),
+        (0.33, 0.53, 0.14),
+        (0.30, 0.54, 0.16),
+        (0.34, 0.51, 0.15),
+        (0.32, 0.51, 0.17),
+    ]
+
+    best_prob_auc = -1.0
+    best_prob_weights = None
+
+    for wx, wc, wl in prob_baseline_candidates:
+        pred = (
+            wx * oof_df["xgb_pred"].values
+            + wc * oof_df["cat_pred"].values
+            + wl * oof_df["lgb_pred"].values
+        )
+        auc = roc_auc_score(y, pred)
+
+        if auc > best_prob_auc:
+            best_prob_auc = auc
+            best_prob_weights = (wx, wc, wl)
+
+    BASELINE_AUC = best_prob_auc
+    BASELINE_NAME = "prob_weighted_current_3model"
+    BASELINE_WEIGHTS = (
+        f"xgb={best_prob_weights[0]:.2f}, "
+        f"cat={best_prob_weights[1]:.2f}, "
+        f"lgb={best_prob_weights[2]:.2f}"
+    )
 
 print(f"xgb AUC                 : {xgb_auc:.6f}")
 print(f"cat AUC                 : {cat_auc:.6f}")
@@ -234,7 +293,9 @@ sub_df["cat_rank"] = to_rank_percentile(sub_df["cat_pred"].values)
 sub_df["lgb_rank"] = to_rank_percentile(sub_df["lgb_pred"].values)
 
 rank_equal_pred = (
-    oof_df["xgb_rank"].values + oof_df["cat_rank"].values + oof_df["lgb_rank"].values
+    oof_df["xgb_rank"].values
+    + oof_df["cat_rank"].values
+    + oof_df["lgb_rank"].values
 ) / 3.0
 rank_equal_auc = roc_auc_score(y, rank_equal_pred)
 
@@ -292,7 +353,7 @@ print(f"[저장] {SEARCH_RESULT_PATH}")
 
 
 # =========================================================
-# 6. best submission 생성 (대회 제출 형식)
+# 6. best submission 생성
 # =========================================================
 print_section("6. best submission 생성")
 
@@ -305,11 +366,11 @@ best_sub_pred = (
 
 rank_oof_path = os.path.join(
     OUTPUT_DIR,
-    f"ensemble_v4_rank_best_xgb{int(round(wx * 100))}_cat{int(round(wc * 100))}_lgb{int(round(wl * 100))}_oof.csv"
+    f"ensemble_v4_rank_xgb_lgbivf_catv7_best_xgb{int(round(wx * 100))}_cat{int(round(wc * 100))}_lgb{int(round(wl * 100))}_oof.csv"
 )
 rank_sub_path = os.path.join(
     OUTPUT_DIR,
-    f"ensemble_v4_rank_best_xgb{int(round(wx * 100))}_cat{int(round(wc * 100))}_lgb{int(round(wl * 100))}_submission.csv"
+    f"ensemble_v4_rank_xgb_lgbivf_catv7_best_xgb{int(round(wx * 100))}_cat{int(round(wc * 100))}_lgb{int(round(wl * 100))}_submission.csv"
 )
 
 rank_oof_df = pd.DataFrame({
@@ -319,7 +380,6 @@ rank_oof_df = pd.DataFrame({
 })
 rank_oof_df.to_csv(rank_oof_path, index=False, encoding="utf-8-sig")
 
-# sample_submission 형식에 맞춰 저장
 final_submission = sample_sub.copy()
 
 if len(final_submission) != len(best_sub_pred):
@@ -393,6 +453,9 @@ log_row = {
     "gain_vs_best_single": round(float(gain_vs_best_single), 6),
     "search_step": SEARCH_STEP,
     "submit_target_col": SUBMIT_TARGET_COL,
+    "xgb_oof_path": XGB_OOF_PATH,
+    "cat_oof_path": CAT_OOF_PATH,
+    "lgb_oof_path": LGB_OOF_PATH,
 }
 
 result_log_df = pd.DataFrame([log_row])
@@ -405,101 +468,6 @@ result_log_df.to_csv(RESULT_LOG_PATH, index=False, encoding="utf-8-sig")
 print(f"[저장] {RESULT_LOG_PATH}")
 print(pd.DataFrame([log_row]).to_string(index=False))
 
-# =========================================================
-# Ensemble Feature Importance
-# =========================================================
-# =========================================================
-# Ensemble Feature Importance
-# =========================================================
-print_section("Ensemble Feature Importance")
-
-XGB_IMPORTANCE_PATH = os.path.join(OUTPUT_DIR, "xgb_v2_reg_relax_feature_importance.csv")
-CAT_IMPORTANCE_PATH = os.path.join(OUTPUT_DIR, "catboost_v2_catboost_baseline_v2_feature_importance.csv")
-LGB_IMPORTANCE_PATH = os.path.join(OUTPUT_DIR, "lightgbm_v1_lightgbm_baseline_v1_feature_importance.csv")
-
-xgb_imp = pd.read_csv(XGB_IMPORTANCE_PATH)
-cat_imp = pd.read_csv(CAT_IMPORTANCE_PATH)
-lgb_imp = pd.read_csv(LGB_IMPORTANCE_PATH)
-
-xgb_imp = xgb_imp.rename(columns={"importance": "xgb_imp"})
-cat_imp = cat_imp.rename(columns={"importance": "cat_imp"})
-lgb_imp = lgb_imp.rename(columns={"importance": "lgb_imp"})
-
-imp = xgb_imp.merge(cat_imp, on="feature", how="outer")
-imp = imp.merge(lgb_imp, on="feature", how="outer")
-imp = imp.fillna(0)
-
-# 중요도 정규화
-for col in ["xgb_imp", "cat_imp", "lgb_imp"]:
-    total = imp[col].sum()
-    if total > 0:
-        imp[col] = imp[col] / total
-
-wx, wc, wl = best_weights
-
-imp["ensemble_importance"] = (
-    wx * imp["xgb_imp"] +
-    wc * imp["cat_imp"] +
-    wl * imp["lgb_imp"]
-)
-
-imp = imp.sort_values("ensemble_importance", ascending=False).reset_index(drop=True)
-
-print("\n[XGB Top 20]")
-print(imp[["feature", "xgb_imp"]].sort_values("xgb_imp", ascending=False).head(20).to_string(index=False))
-
-print("\n[CAT Top 20]")
-print(imp[["feature", "cat_imp"]].sort_values("cat_imp", ascending=False).head(20).to_string(index=False))
-
-print("\n[LGB Top 20]")
-print(imp[["feature", "lgb_imp"]].sort_values("lgb_imp", ascending=False).head(20).to_string(index=False))
-
-print("\n[Top 30 Ensemble Features]")
-print(
-    imp[["feature", "xgb_imp", "cat_imp", "lgb_imp", "ensemble_importance"]]
-    .head(30)
-    .to_string(index=False)
-)
-
-ensemble_imp_path = os.path.join(OUTPUT_DIR, "ensemble_feature_importance.csv")
-imp.to_csv(ensemble_imp_path, index=False, encoding="utf-8-sig")
-
-print(f"\n저장: {ensemble_imp_path}")
-# print_section("Ensemble Feature Importance")
-
-# XGB_IMPORTANCE_PATH = os.path.join(OUTPUT_DIR, "xgb_v2_reg_relax_feature_importance.csv")
-# CAT_IMPORTANCE_PATH = os.path.join(OUTPUT_DIR, "catboost_v2_catboost_baseline_v2_feature_importance.csv")
-# LGB_IMPORTANCE_PATH = os.path.join(OUTPUT_DIR, "lightgbm_v1_lightgbm_baseline_v1_feature_importance.csv")
-
-# xgb_imp = pd.read_csv(XGB_IMPORTANCE_PATH)
-# cat_imp = pd.read_csv(CAT_IMPORTANCE_PATH)
-# lgb_imp = pd.read_csv(LGB_IMPORTANCE_PATH)
-
-# xgb_imp = xgb_imp.rename(columns={"importance":"xgb_imp"})
-# cat_imp = cat_imp.rename(columns={"importance":"cat_imp"})
-# lgb_imp = lgb_imp.rename(columns={"importance":"lgb_imp"})
-
-# imp = xgb_imp.merge(cat_imp, on="feature", how="outer")
-# imp = imp.merge(lgb_imp, on="feature", how="outer")
-# imp = imp.fillna(0)
-
-# wx, wc, wl = best_weights
-
-# imp["ensemble_importance"] = (
-#     wx * imp["xgb_imp"] +
-#     wc * imp["cat_imp"] +
-#     wl * imp["lgb_imp"]
-# )
-
-# imp = imp.sort_values("ensemble_importance", ascending=False)
-
-# print("\n[Top 30 Ensemble Features]")
-# print(imp.head(30).to_string(index=False))
-
-# ensemble_imp_path = os.path.join(OUTPUT_DIR, "ensemble_feature_importance.csv")
-# imp.to_csv(ensemble_imp_path, index=False)
-
-# print(f"\n저장: {ensemble_imp_path}")
 
 # =========================================================
 # 9. 완료

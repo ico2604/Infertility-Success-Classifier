@@ -408,9 +408,7 @@ print(pd.DataFrame([log_row]).to_string(index=False))
 # =========================================================
 # Ensemble Feature Importance
 # =========================================================
-# =========================================================
-# Ensemble Feature Importance
-# =========================================================
+
 print_section("Ensemble Feature Importance")
 
 XGB_IMPORTANCE_PATH = os.path.join(OUTPUT_DIR, "xgb_v2_reg_relax_feature_importance.csv")
@@ -421,19 +419,13 @@ xgb_imp = pd.read_csv(XGB_IMPORTANCE_PATH)
 cat_imp = pd.read_csv(CAT_IMPORTANCE_PATH)
 lgb_imp = pd.read_csv(LGB_IMPORTANCE_PATH)
 
-xgb_imp = xgb_imp.rename(columns={"importance": "xgb_imp"})
-cat_imp = cat_imp.rename(columns={"importance": "cat_imp"})
-lgb_imp = lgb_imp.rename(columns={"importance": "lgb_imp"})
+xgb_imp = xgb_imp.rename(columns={"importance":"xgb_imp"})
+cat_imp = cat_imp.rename(columns={"importance":"cat_imp"})
+lgb_imp = lgb_imp.rename(columns={"importance":"lgb_imp"})
 
 imp = xgb_imp.merge(cat_imp, on="feature", how="outer")
 imp = imp.merge(lgb_imp, on="feature", how="outer")
 imp = imp.fillna(0)
-
-# 중요도 정규화
-for col in ["xgb_imp", "cat_imp", "lgb_imp"]:
-    total = imp[col].sum()
-    if total > 0:
-        imp[col] = imp[col] / total
 
 wx, wc, wl = best_weights
 
@@ -443,63 +435,15 @@ imp["ensemble_importance"] = (
     wl * imp["lgb_imp"]
 )
 
-imp = imp.sort_values("ensemble_importance", ascending=False).reset_index(drop=True)
-
-print("\n[XGB Top 20]")
-print(imp[["feature", "xgb_imp"]].sort_values("xgb_imp", ascending=False).head(20).to_string(index=False))
-
-print("\n[CAT Top 20]")
-print(imp[["feature", "cat_imp"]].sort_values("cat_imp", ascending=False).head(20).to_string(index=False))
-
-print("\n[LGB Top 20]")
-print(imp[["feature", "lgb_imp"]].sort_values("lgb_imp", ascending=False).head(20).to_string(index=False))
+imp = imp.sort_values("ensemble_importance", ascending=False)
 
 print("\n[Top 30 Ensemble Features]")
-print(
-    imp[["feature", "xgb_imp", "cat_imp", "lgb_imp", "ensemble_importance"]]
-    .head(30)
-    .to_string(index=False)
-)
+print(imp.head(30).to_string(index=False))
 
 ensemble_imp_path = os.path.join(OUTPUT_DIR, "ensemble_feature_importance.csv")
-imp.to_csv(ensemble_imp_path, index=False, encoding="utf-8-sig")
+imp.to_csv(ensemble_imp_path, index=False)
 
 print(f"\n저장: {ensemble_imp_path}")
-# print_section("Ensemble Feature Importance")
-
-# XGB_IMPORTANCE_PATH = os.path.join(OUTPUT_DIR, "xgb_v2_reg_relax_feature_importance.csv")
-# CAT_IMPORTANCE_PATH = os.path.join(OUTPUT_DIR, "catboost_v2_catboost_baseline_v2_feature_importance.csv")
-# LGB_IMPORTANCE_PATH = os.path.join(OUTPUT_DIR, "lightgbm_v1_lightgbm_baseline_v1_feature_importance.csv")
-
-# xgb_imp = pd.read_csv(XGB_IMPORTANCE_PATH)
-# cat_imp = pd.read_csv(CAT_IMPORTANCE_PATH)
-# lgb_imp = pd.read_csv(LGB_IMPORTANCE_PATH)
-
-# xgb_imp = xgb_imp.rename(columns={"importance":"xgb_imp"})
-# cat_imp = cat_imp.rename(columns={"importance":"cat_imp"})
-# lgb_imp = lgb_imp.rename(columns={"importance":"lgb_imp"})
-
-# imp = xgb_imp.merge(cat_imp, on="feature", how="outer")
-# imp = imp.merge(lgb_imp, on="feature", how="outer")
-# imp = imp.fillna(0)
-
-# wx, wc, wl = best_weights
-
-# imp["ensemble_importance"] = (
-#     wx * imp["xgb_imp"] +
-#     wc * imp["cat_imp"] +
-#     wl * imp["lgb_imp"]
-# )
-
-# imp = imp.sort_values("ensemble_importance", ascending=False)
-
-# print("\n[Top 30 Ensemble Features]")
-# print(imp.head(30).to_string(index=False))
-
-# ensemble_imp_path = os.path.join(OUTPUT_DIR, "ensemble_feature_importance.csv")
-# imp.to_csv(ensemble_imp_path, index=False)
-
-# print(f"\n저장: {ensemble_imp_path}")
 
 # =========================================================
 # 9. 완료
